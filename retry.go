@@ -1,7 +1,7 @@
 package glow
 
 import (
-	"math/rand"
+	"github.com/hsiafan/sugar/randx"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func NewFixIntervalRetry(times int, interval time.Duration) *Retry {
 	}}
 }
 
-// NewFixIntervalRetry return a new Retry with random interval between minInterval(included) and maxInterval(excluded).
+// NewFixIntervalRetry return a new Retry with random interval between minInterval(inclusive) and maxInterval(inclusive).
 // If minInterval or maxInterval is negative, will be treat as 0.
 // If minInterval equals or larger than maxInterval, will always use minInterval as interval
 func NewRandomIntervalRetry(times int, minInterval time.Duration, maxInterval time.Duration) *Retry {
@@ -33,30 +33,30 @@ func NewRandomIntervalRetry(times int, minInterval time.Duration, maxInterval ti
 	if maxInterval < time.Duration(0) {
 		minInterval = time.Duration(0)
 	}
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r := randx.New()
 	return &Retry{MaxTimes: times, IntervalFunc: func(retryTime int) time.Duration {
 		if minInterval >= maxInterval {
 			return minInterval
 		}
-		interval := minInterval + time.Duration(random.Int63()%(int64(maxInterval)-int64(minInterval)))
+		interval := minInterval + time.Duration(r.Int64Between(int64(minInterval), int64(maxInterval)+1))
 		return interval
 	}}
 }
 
 // NewBinaryExponentialBackOff return Binary Exponential Back off retry.
-// The interval random chooses between (2^n-1 * initialInterval, 2^n * initialInterval) for n-th retry.
+// The interval random chooses between [0, 2^n * initialInterval] for n-th retry.
 // If initialInterval is negative, will be treat as 0.
 func NewBinaryExponentialBackOff(times int, initialInterval time.Duration) *Retry {
 	if initialInterval < time.Duration(0) {
 		initialInterval = time.Duration(0)
 	}
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r := randx.New()
 	intervalLimit := initialInterval
 	return &Retry{MaxTimes: times, IntervalFunc: func(retryTime int) time.Duration {
 		if intervalLimit == time.Duration(0) {
 			return intervalLimit
 		}
-		interval := time.Duration(random.Int63() % int64(intervalLimit))
+		interval := time.Duration(r.Int64Within(int64(intervalLimit) + 1))
 		intervalLimit = intervalLimit * 2
 		return interval
 	}}
