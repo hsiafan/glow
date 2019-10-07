@@ -36,3 +36,20 @@ func TestRand_IntBetween(t *testing.T) {
 	v := r.IntBetween(2, 5)
 	assert.True(t, 2 <= v && v < 5)
 }
+
+func Benchmark_Int32Within(b *testing.B) {
+	r := New()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		r.Int32Within(1<<30)
+	}
+}
+
+
+func Benchmark_Int64Within(b *testing.B) {
+	r := New()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		r.Int64Within(1<<30)
+	}
+}
