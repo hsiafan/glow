@@ -1,6 +1,7 @@
 package glow
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hsiafan/sugar/randx"
@@ -14,10 +15,10 @@ type Retry struct {
 }
 
 // NewFixIntervalRetry return a new Retry with fixed interval between Retry.
-// If interval is negative, will be treat as 0.
+// If interval is negative, will panic
 func NewFixIntervalRetry(times int, interval time.Duration) *Retry {
 	if interval < time.Duration(0) {
-		interval = time.Duration(0)
+		panic(fmt.Sprint("invalid interval valus:", interval))
 	}
 	return &Retry{MaxTimes: times, IntervalFunc: func(retryTime int) time.Duration {
 		return interval
@@ -25,11 +26,10 @@ func NewFixIntervalRetry(times int, interval time.Duration) *Retry {
 }
 
 // NewRandomIntervalRetry return a new Retry with random interval between minInterval(inclusive) and maxInterval(inclusive).
-// If minInterval or maxInterval is negative, will be treat as 0.
-// If minInterval equals or larger than maxInterval, will always use minInterval as interval
+// If minInterval or maxInterval is negative, or minInterval equals or larger than maxInterval, will panic.
 func NewRandomIntervalRetry(times int, minInterval time.Duration, maxInterval time.Duration) *Retry {
 	if minInterval < time.Duration(0) || maxInterval < time.Duration(0) || minInterval > maxInterval {
-		panic("invalid interval valus:")
+		panic(fmt.Sprint("invalid interval valus, minInterval:", minInterval, ", maxInterval:", maxInterval))
 	}
 	r := randx.New()
 	return &Retry{MaxTimes: times, IntervalFunc: func(retryTime int) time.Duration {
@@ -40,12 +40,13 @@ func NewRandomIntervalRetry(times int, minInterval time.Duration, maxInterval ti
 
 // NewExponentialBackOff return Binary Exponential Back off retry.
 // The interval random chooses between [0, 2^n * initialInterval] for n-th retry.
-// If initialInterval is negative, will be treat as 0.
+// If initialInterval, minInterval or maxInterval is negative, or minInterval equals or larger than maxInterval, will panic.
 func NewExponentialBackOff(times int, initialInterval time.Duration, minInterval time.Duration,
 	maxInterval time.Duration) *Retry {
 	if initialInterval < time.Duration(0) || minInterval < time.Duration(0) ||
 		maxInterval < time.Duration(0) || minInterval > maxInterval {
-		panic("invalid interval valus:")
+		panic(fmt.Sprint("invalid interval valus, initialInterval:", initialInterval,
+			", minInterval:", minInterval, ", maxInterval:", maxInterval))
 	}
 	r := randx.New()
 	intervalLimit := initialInterval
