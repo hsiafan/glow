@@ -32,9 +32,8 @@ func (r *Rand) IntWithin(bound int) int {
 	}
 	if bound <= math.MaxInt32 {
 		return int(r.Int32Within(int32(bound)))
-	} else {
-		return int(r.Int64Within(int64(bound)))
 	}
+	return int(r.Int64Within(int64(bound)))
 }
 
 // IntBetween return a random value within range [low, high)

@@ -1,8 +1,9 @@
 package randx
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRand_Int32Within(t *testing.T) {
@@ -10,6 +11,8 @@ func TestRand_Int32Within(t *testing.T) {
 	assert.Equal(t, int32(0), r.Int32Within(1))
 	v := r.Int32Within(2)
 	assert.True(t, 0 <= v && v < 2)
+	v = r.Int32Within(3)
+	assert.True(t, 0 <= v && v < 3)
 }
 
 func TestRand_Int64Within(t *testing.T) {
@@ -41,15 +44,14 @@ func Benchmark_Int32Within(b *testing.B) {
 	r := New()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		r.Int32Within(1<<30)
+		r.Int32Within(1 << 30)
 	}
 }
-
 
 func Benchmark_Int64Within(b *testing.B) {
 	r := New()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		r.Int64Within(1<<30)
+		r.Int64Within(1 << 30)
 	}
 }
