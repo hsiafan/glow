@@ -2,9 +2,10 @@ package glow
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewFixIntervalRetry(t *testing.T) {
@@ -30,29 +31,28 @@ func TestNewFixIntervalRetry(t *testing.T) {
 }
 
 func TestNewRandomIntervalRetry(t *testing.T) {
-	//	retry := NewRandomIntervalRetry(3, time.Duration(0), time.Second*3)
-	//	err := retry.Run(func() error {
-	//		return errors.New("for test")
-	//	})
-	//	assert.Error(t, err)
-	retry := NewRandomIntervalRetry(3, time.Duration(-10), time.Second*-100)
+	retry := NewRandomIntervalRetry(3, time.Duration(0), time.Microsecond*3)
 	err := retry.Run(func() error {
 		return errors.New("for test")
 	})
-	errors.Unwrap()
 	assert.Error(t, err)
+	// retry := NewRandomIntervalRetry(3, time.Duration(-10), time.Second*-100)
+	// err := retry.Run(func() error {
+	// 	return errors.New("for test")
+	// })
+	// assert.Error(t, err)
 }
 
-func TestNewBinaryExponentialBackOff(t *testing.T) {
-	//retry := NewBinaryExponentialBackOff(3, time.Second*1)
-	//err := retry.Run(func() error {
-	//	return errors.New("for test")
-	//})
-	//assert.Error(t, err)
-
-	retry := NewBinaryExponentialBackOff(3, time.Duration(-1))
+func TestNewExponentialBackOff(t *testing.T) {
+	retry := NewExponentialBackOff(3, time.Microsecond*1, time.Microsecond*1, time.Microsecond*10)
 	err := retry.Run(func() error {
 		return errors.New("for test")
 	})
 	assert.Error(t, err)
+
+	// retry := NewExponentialBackOff(3, time.Duration(-1), time.Duration(10), time.Duration(1000))
+	// err := retry.Run(func() error {
+	// 	return errors.New("for test")
+	// })
+	// assert.Error(t, err)
 }
