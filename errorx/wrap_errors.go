@@ -1,6 +1,6 @@
 package errorx
 
-//WrappedError wrapped another error
+// WrappedError wrapped another error
 type WrappedError interface {
 	error
 	Cause() error // The error wrapped
