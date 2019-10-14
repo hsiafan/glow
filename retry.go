@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hsiafan/sugar/randx"
+	"github.com/hsiafan/glow/randx"
 )
 
 // Retry is a utils for retrying execution.
