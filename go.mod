@@ -1,4 +1,4 @@
-module github.com/hsiafan/sugar
+module github.com/hsiafan/glow
 
 go 1.13
 
