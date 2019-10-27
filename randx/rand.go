@@ -1,9 +1,10 @@
 package randx
 
 import (
+	"errors"
+	"github.com/hsiafan/glow/intx"
 	"math"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -24,31 +25,45 @@ func NewWithSeed(seed int64) *Rand {
 	}
 }
 
-// IntWithin return a random value within range [0, bound)
-// If bound is less than or equals with 0, this method panics
-func (r *Rand) IntWithin(bound int) int {
+var boundError = errors.New("bound less than or equals zero")
+var boundRangeError = errors.New("low bound larger than/equals high bound")
+var boundOverFlowError = errors.New("bound range overflows int")
+
+// IntWithin return a random value within range [0, bound) if bound larger than 0,
+// return an error if bound is less than or equals 0.
+func (r *Rand) IntWithin(bound int) (int, error) {
 	if bound <= 0 {
-		panic("bound less or equal than zero: " + strconv.Itoa(bound))
+		return 0, boundError
 	}
 	if bound <= math.MaxInt32 {
-		return int(r.Int32Within(int32(bound)))
+		v, err := r.Int32Within(int32(bound))
+		return int(v), err
 	}
-	return int(r.Int64Within(int64(bound)))
+	v, err := r.Int64Within(int64(bound))
+	return int(v), err
 }
 
-// IntBetween return a random value within range [low, high)
-func (r *Rand) IntBetween(low int, high int) int {
+// IntBetween return a random value within range [low, high) if low less than high,
+// return an error if low is larger than or equals high, or high-low overflows int.
+func (r *Rand) IntBetween(low int, high int) (int, error) {
 	if low >= high {
-		panic("high " + strconv.Itoa(high) + " less or equal than low: " + strconv.Itoa(low))
+		return 0, boundRangeError
 	}
-	return low + r.IntWithin(high-low)
+	if low < 0 && (intx.MaxInt+low) < high {
+		return 0, boundOverFlowError
+	}
+	v, err := r.IntWithin(high - low)
+	if err != nil {
+		return 0, err
+	}
+	return low + v, err
 }
 
-// Int32Within return a random value within range [0, bound)
-// If bound is less than or equals with 0, this method panics
-func (r *Rand) Int32Within(bound int32) int32 {
+// Int32Within return a random int32 value within range [0, bound) if bound larger than 0,
+// return an error if bound is less than or equals 0.
+func (r *Rand) Int32Within(bound int32) (int32, error) {
 	if bound <= 0 {
-		panic("bound less or equal than zero: " + strconv.Itoa(int(bound)))
+		return 0, boundError
 	}
 	v := r.Int31()
 	m := bound - 1
@@ -66,14 +81,14 @@ func (r *Rand) Int32Within(bound int32) int32 {
 			}
 		}
 	}
-	return v
+	return v, nil
 }
 
-// Int64Within return a random value within range [0, bound)
-// If bound is less than or equals with 0, this method panics
-func (r *Rand) Int64Within(bound int64) int64 {
+// Int64Within return a random int64 value within range [0, bound).
+// If bound is less than or equals with 0, return an error
+func (r *Rand) Int64Within(bound int64) (int64, error) {
 	if bound <= 0 {
-		panic("bound less or equal than zero: " + strconv.FormatInt(bound, 10))
+		return 0, boundError
 	}
 	v := r.Int63()
 	m := bound - 1
@@ -90,13 +105,5 @@ func (r *Rand) Int64Within(bound int64) int64 {
 			}
 		}
 	}
-	return v
-}
-
-// Int64Between return a random value within range [low, high)
-func (r *Rand) Int64Between(low int64, high int64) int64 {
-	if low >= high {
-		panic("high " + strconv.FormatInt(high, 10) + " less or equal than low: " + strconv.FormatInt(low, 10))
-	}
-	return low + r.Int64Within(high-low)
+	return v, nil
 }

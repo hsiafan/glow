@@ -6,9 +6,9 @@ import (
 )
 
 func TestParseInt(t *testing.T) {
-	assert.Equal(t, 100000000, SafeParse("100000000", -1))
+	assert.Equal(t, 100000000, SafeParseInt("100000000", -1))
 }
 
 func TestFormatInt(t *testing.T) {
-	assert.Equal(t, "100", Format(100))
+	assert.Equal(t, "100", FormatInt(100))
 }
