@@ -43,6 +43,16 @@ func (r *Rand) IntWithin(bound int) (int, error) {
 	return int(v), err
 }
 
+// IntWithin return a random value within range [0, bound) if bound larger than 0.
+// panics bound is less than or equals 0.
+func (r *Rand) MustIntWithin(bound int) int {
+	v, err := r.IntWithin(bound)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
 // IntBetween return a random value within range [low, high) if low less than high,
 // return an error if low is larger than or equals high, or high-low overflows int.
 func (r *Rand) IntBetween(low int, high int) (int, error) {
@@ -57,6 +67,16 @@ func (r *Rand) IntBetween(low int, high int) (int, error) {
 		return 0, err
 	}
 	return low + v, err
+}
+
+// IntBetween return a random value within range [low, high).
+// panics if low is larger than or equals high, or high-low overflows int.
+func (r *Rand) MustIntBetween(low int, high int) int {
+	v, err := r.IntBetween(low, high)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }
 
 // Int32Within return a random int32 value within range [0, bound) if bound larger than 0,
