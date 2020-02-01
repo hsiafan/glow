@@ -1,7 +1,6 @@
 package retry
 
 import (
-	"github.com/hsiafan/glow/intx"
 	"time"
 )
 
@@ -13,10 +12,11 @@ type Retry struct {
 }
 
 // Create new Retry with options
-func New(options ...func(*Retry)) *Retry {
+// The retryTimes do not count the first execution. If retryTimes less than 0, will not do retry.
+func New(retryTimes int, options ...func(*Retry)) *Retry {
 	retry := &Retry{
 		backOff:    &fixedDelayBackOff{0},
-		retryTimes: intx.MaxInt,
+		retryTimes: retryTimes,
 		shouldRetry: func(err error) bool {
 			return true
 		},
@@ -46,13 +46,6 @@ func BackOffBy(backOff BackOff) func(retry *Retry) {
 	}
 }
 
-// Set retry times. Default is max Int
-func MaxTimes(times int) func(*Retry) {
-	return func(retry *Retry) {
-		retry.retryTimes = times
-	}
-}
-
 // Retry if err is accepted by f. Default retry for all errors
 func If(f func(err error) bool) func(*Retry) {
 	return func(retry *Retry) {
@@ -74,31 +67,4 @@ func (r *Retry) Run(f func() error) error {
 		}
 	}
 	return err
-}
-
-// Back off strategy for retry
-type BackOff interface {
-	// return interval before nth retry. retry times begin with 1.
-	intervalBefore(retryTimes int) time.Duration
-}
-
-type fixedDelayBackOff struct {
-	delay time.Duration
-}
-
-func (b *fixedDelayBackOff) intervalBefore(retryTimes int) time.Duration {
-	return b.delay
-}
-
-type binaryExponentialBackOff struct {
-	initDelay time.Duration
-	maxDelay  time.Duration
-}
-
-func (b *binaryExponentialBackOff) intervalBefore(retryTimes int) time.Duration {
-	delay := b.initDelay << (retryTimes - 1)
-	if delay > b.maxDelay {
-		return b.maxDelay
-	}
-	return delay
 }
