@@ -26,3 +26,26 @@ func SplitHostPort(str string) (string, int, error) {
 	}
 	return host, port, nil
 }
+
+type HostType int8
+
+const (
+	DOMAIN HostType = 0
+	IPv4   HostType = 1
+	IPv6   HostType = 2
+)
+
+func GetHostType(host string) HostType {
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return DOMAIN
+	}
+	if ip.To4() != nil {
+		return IPv4
+	}
+	if ip.To16() != nil {
+		return IPv6
+	}
+	//should not happen
+	panic("unknown ip type: " + ip.String())
+}
