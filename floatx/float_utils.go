@@ -15,12 +15,12 @@ func Format32(value float32, decimals int) string {
 }
 
 // Parse64 convert str to float64.
-func Parse64(str string, defaultValue float64) (float64, error) {
+func Parse64(str string) (float64, error) {
 	return strconv.ParseFloat(str, 64)
 }
 
 // Parse32 convert str to float32.
-func Parse32(str string, defaultValue float32) (float32, error) {
+func Parse32(str string) (float32, error) {
 	value, err := strconv.ParseFloat(str, 32)
 	if err != nil {
 		return 0.0, err
@@ -30,7 +30,7 @@ func Parse32(str string, defaultValue float32) (float32, error) {
 
 // SafeParse64 convert str to float64. if str is not a illegal uint value representation, return defaultValue
 func SafeParse64(str string, defaultValue float64) float64 {
-	if value, err := Parse64(str, 64); err == nil {
+	if value, err := Parse64(str); err == nil {
 		return value
 	}
 	return defaultValue
@@ -38,7 +38,7 @@ func SafeParse64(str string, defaultValue float64) float64 {
 
 // SafeParse32 convert str to float32. if str is not a illegal uint value representation, return defaultValue
 func SafeParse32(str string, defaultValue float32) float32 {
-	if value, err := Parse32(str, 32); err == nil {
+	if value, err := Parse32(str); err == nil {
 		return value
 	}
 	return defaultValue

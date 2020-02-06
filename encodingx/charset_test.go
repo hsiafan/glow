@@ -1,4 +1,4 @@
-package charsetx
+package encodingx
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -7,13 +7,13 @@ import (
 )
 
 func TestEncodeString(t *testing.T) {
-	data, err := EncodeString("测试", simplifiedchinese.GB18030)
+	data, err := Encode("测试", simplifiedchinese.GB18030)
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{0xb2, 0xe2, 0xca, 0xd4}, data)
 }
 
 func TestDecodeString(t *testing.T) {
-	str, err := DecodeString([]byte{0xb2, 0xe2, 0xca, 0xd4}, simplifiedchinese.GB18030)
+	str, err := Decode([]byte{0xb2, 0xe2, 0xca, 0xd4}, simplifiedchinese.GB18030)
 	assert.NoError(t, err)
 	assert.Equal(t, "测试", str)
 }

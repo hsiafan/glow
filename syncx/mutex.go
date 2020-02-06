@@ -20,6 +20,7 @@ type Mutex struct {
 
 // Try lock
 func (m *Mutex) TryLock() bool {
+	// state is first field
 	if atomic.CompareAndSwapInt32((*int32)(unsafe.Pointer(&m.Mutex)), 0, mutexLocked) {
 		return true
 	}
