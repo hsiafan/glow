@@ -1,13 +1,14 @@
 package timex
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEpochMills(t *testing.T) {
-	tm := OfEpochMills(1570612959000)
+	tm := EpochMills(1570612959000)
 	y, m, d := tm.Date()
 	assert.Equal(t, 2019, y)
 	assert.Equal(t, time.Month(10), m)
@@ -15,7 +16,7 @@ func TestEpochMills(t *testing.T) {
 }
 
 func TestEpoch(t *testing.T) {
-	tm := OfEpoch(1570612959)
+	tm := Epoch(1570612959)
 	y, m, d := tm.Date()
 	assert.Equal(t, 2019, y)
 	assert.Equal(t, time.Month(10), m)
@@ -23,7 +24,7 @@ func TestEpoch(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
-	tm := OfEpochMills(1570612959000)
+	tm := EpochMills(1570612959000)
 	assert.Equal(t, "2019-10-09", tm.Format(SimpleDate))
 	assert.Equal(t, "2019-10-09 17:22:39", tm.Format(SimpleTime))
 	assert.Equal(t, "2019-10-09 17:22:39.000", tm.Format(SimpleTimeMills))
