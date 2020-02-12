@@ -6,7 +6,7 @@ import (
 
 // For retry run code
 type Retry struct {
-	backOff     BackOff
+	backoff     Backoff
 	retryTimes  int
 	shouldRetry func(err error) bool
 }
@@ -15,7 +15,7 @@ type Retry struct {
 // The retryTimes do not count the first execution. If retryTimes less than 0, will not do retry.
 func New(retryTimes int, options ...func(*Retry)) *Retry {
 	retry := &Retry{
-		backOff:    &fixedDelayBackOff{0},
+		backoff:    &fixedDelayBackoff{0},
 		retryTimes: retryTimes,
 		shouldRetry: func(err error) bool {
 			return true
@@ -29,20 +29,20 @@ func New(retryTimes int, options ...func(*Retry)) *Retry {
 
 // Wait fixed delay before each retry. Default is 0.
 func FixedDelay(delay time.Duration) func(*Retry) {
-	return BackOffBy(&fixedDelayBackOff{delay: delay})
+	return BackoffBy(&fixedDelayBackoff{delay: delay})
 }
 
-// ExponentialBackOff delay for retry.
+// ExponentialBackoff delay for retry.
 // initialDelay: the delay for first retry;
 // maxDelay: the max delay time.
-func ExponentialBackOff(initialDelay, maxDelay time.Duration) func(*Retry) {
-	return BackOffBy(&binaryExponentialBackOff{initialDelay, maxDelay})
+func ExponentialBackoff(initialDelay, maxDelay time.Duration) func(*Retry) {
+	return BackoffBy(&binaryExponentialBackoff{initialDelay, maxDelay})
 }
 
 // Set back off strategy for retry. Default wait no delay
-func BackOffBy(backOff BackOff) func(retry *Retry) {
+func BackoffBy(backOff Backoff) func(retry *Retry) {
 	return func(retry *Retry) {
-		retry.backOff = backOff
+		retry.backoff = backOff
 	}
 }
 
@@ -60,7 +60,7 @@ func (r *Retry) Run(f func() error) error {
 		return nil
 	}
 	for i := 1; i <= r.retryTimes; i++ {
-		time.Sleep(r.backOff.intervalBefore(i + 1))
+		time.Sleep(r.backoff.intervalBefore(i + 1))
 		err = f()
 		if err == nil || !r.shouldRetry(err) {
 			return nil
