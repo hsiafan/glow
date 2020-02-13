@@ -14,12 +14,12 @@ func Micros(micros int) time.Duration {
 
 // Seconds make creating time.Duration from seconds easier
 func Seconds(seconds int) time.Duration {
-	return time.Microsecond * time.Duration(seconds)
+	return time.Second * time.Duration(seconds)
 }
 
 // Minutes make creating time.Duration from minutes easier
 func Minutes(minutes int) time.Duration {
-	return time.Microsecond * time.Duration(minutes)
+	return time.Minute * time.Duration(minutes)
 }
 
 // Hours make creating time.Duration from hours easier

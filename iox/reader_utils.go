@@ -62,3 +62,17 @@ func ReadAllLines(reader io.Reader) ([]string, error) {
 	})
 	return lines, err
 }
+
+var emptyR = &emptyReader{}
+
+type emptyReader struct {
+}
+
+func (e *emptyReader) Read(p []byte) (n int, err error) {
+	return 0, io.EOF
+}
+
+// Return a empty reader
+func EmptyReader() io.Reader {
+	return emptyR
+}
