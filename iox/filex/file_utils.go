@@ -1,12 +1,12 @@
 package filex
 
 import (
-	"github.com/hsiafan/glow/encodingx"
+	"io/ioutil"
+	"os"
+
 	"github.com/hsiafan/glow/iox"
 	"github.com/hsiafan/glow/unsafex"
 	"golang.org/x/text/encoding"
-	"io/ioutil"
-	"os"
 )
 
 // Read and return all data as string in file
@@ -15,7 +15,11 @@ func ReadAllToStringWithEncoding(path string, encoding encoding.Encoding) (strin
 	if err != nil {
 		return "", err
 	}
-	return encodingx.Decode(data, encoding)
+	decoded, err := encoding.NewDecoder().Bytes(data)
+	if err != nil {
+		return "", err
+	}
+	return string(decoded), err
 }
 
 // Read and return all data as string in file
@@ -136,7 +140,7 @@ func WriteString(path string, str string) error {
 
 // Write all string content to file using specific encoding, and then close. If file already exists, will be override
 func WriteStringWithEncoding(path string, str string, encoding encoding.Encoding) error {
-	data, err := encodingx.Encode(str, encoding)
+	data, err := encoding.NewEncoder().Bytes(unsafex.StringToBytes(str))
 	if err != nil {
 		return err
 	}
