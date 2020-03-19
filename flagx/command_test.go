@@ -1,8 +1,9 @@
 package flagx
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_toFlagName(t *testing.T) {
@@ -32,7 +33,7 @@ type Option struct {
 	Update bool
 	Dry    bool
 	Name   string   `description:"the name"`
-	Age    int      `name:"age" description:"the age" default_:"1"`
+	Age    int      `name:"age" description:"the age" default:"1"`
 	Files  []string `args:"true"`
 	File   string   `args:"true" index:"1"`
 }

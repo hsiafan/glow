@@ -4,20 +4,21 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/hsiafan/glow/floatx"
-	"github.com/hsiafan/glow/intx"
-	"github.com/hsiafan/glow/reflectx"
-	"github.com/hsiafan/glow/stringx/ascii"
 	"reflect"
 	"sort"
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/hsiafan/glow/floatx"
+	"github.com/hsiafan/glow/intx"
+	"github.com/hsiafan/glow/reflectx"
+	"github.com/hsiafan/glow/stringx/ascii"
 )
 
 const (
 	nameField         = "name"
-	defaultValueField = "default_"
+	defaultValueField = "default"
 	descriptionField  = "description"
 	argsField         = "args"
 	indexField        = "index"
