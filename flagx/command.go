@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -179,6 +180,11 @@ func argsDesc(argFields []argFiled) string {
 		sb.WriteString(f.name)
 	}
 	return sb.String()
+}
+
+// Parse commandline passed arguments
+func (c *Command) ParseOsArgs(arguments []string) error {
+	return c.Parse(os.Args[1:])
 }
 
 // Parse arguments

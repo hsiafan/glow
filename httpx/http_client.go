@@ -3,17 +3,18 @@ package httpx
 import (
 	"crypto/tls"
 	"errors"
-	"github.com/hsiafan/glow/httpx/header"
-	"github.com/hsiafan/glow/iox"
-	"github.com/hsiafan/glow/timex/durationx"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/htmlindex"
 	"io"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"time"
+
+	"github.com/hsiafan/glow/httpx/header"
+	"github.com/hsiafan/glow/iox"
+	"github.com/hsiafan/glow/timex/durationx"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/htmlindex"
 )
 
 // Http Client
@@ -242,21 +243,21 @@ func ExpectContinueTimeout(timeout time.Duration) ClientOption {
 }
 
 // Disable Http keep alive (http connection reuse)
-func DisableHttpKeepAlive() ClientOption {
+func DisableHTTPKeepAlive() ClientOption {
 	return func(client *Client) {
 		client.transport.DisableKeepAlives = true
 	}
 }
 
 // Disable tcp connection keep alive
-func DisableTcpKeepAlive() ClientOption {
+func DisableTCPKeepAlive() ClientOption {
 	return func(client *Client) {
 		client.dialer.KeepAlive = -1
 	}
 }
 
 // Do not verify tls certificate chain and server name.
-func DisableTlsVerify() ClientOption {
+func DisableTLSVerify() ClientOption {
 	return func(client *Client) {
 		client.tlsConfig.InsecureSkipVerify = true
 	}

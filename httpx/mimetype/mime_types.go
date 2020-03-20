@@ -2,7 +2,7 @@ package mimetype
 
 // mime types
 const (
-	Json        = "application/json"
+	JSON        = "application/json"
 	FormEncoded = "application/x-www-form-urlencoded"
 	OctetStream = "application/octet-stream"
 	PlainText   = "text/plain"

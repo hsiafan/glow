@@ -3,14 +3,15 @@ package httpx
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/hsiafan/glow/httpx/mimetype"
-	"github.com/hsiafan/glow/iox"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/unicode"
 	"io"
 	"mime/multipart"
 	"strconv"
 	"strings"
+
+	"github.com/hsiafan/glow/httpx/mimetype"
+	"github.com/hsiafan/glow/iox"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/unicode"
 )
 
 // Http body, with content type
@@ -130,32 +131,32 @@ func (s *StringBody) GetReader() (io.Reader, error) {
 	return s.enc.NewDecoder().Reader(reader), nil
 }
 
-var _ Body = (*JsonBody)(nil)
+var _ Body = (*JSONBody)(nil)
 
 // Body marshal value as json
-type JsonBody struct {
+type JSONBody struct {
 	hasEncoding
 	value interface{}
 }
 
 // Create new Body from value, marshall to json
-func NewJsonBody(value interface{}) *JsonBody {
-	return NewJsonBodyWithEncoding(value, unicode.UTF8)
+func NewJSONBody(value interface{}) *JSONBody {
+	return NewJSONBodyWithEncoding(value, unicode.UTF8)
 }
 
 // Create new Body from value, marshall to json
-func NewJsonBodyWithEncoding(value interface{}, enc encoding.Encoding) *JsonBody {
-	return &JsonBody{
+func NewJSONBodyWithEncoding(value interface{}, enc encoding.Encoding) *JSONBody {
+	return &JSONBody{
 		hasEncoding: hasEncoding{enc},
 		value:       value,
 	}
 }
 
-func (j *JsonBody) ContentType() string {
-	return mimetype.Json
+func (j *JSONBody) ContentType() string {
+	return mimetype.JSON
 }
 
-func (j *JsonBody) GetReader() (io.Reader, error) {
+func (j *JSONBody) GetReader() (io.Reader, error) {
 	data, err := json.Marshal(j.value)
 	if err != nil {
 		return nil, err

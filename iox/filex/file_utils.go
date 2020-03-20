@@ -1,6 +1,7 @@
 package filex
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -10,12 +11,12 @@ import (
 )
 
 // Read and return all data as string in file
-func ReadAllToStringWithEncoding(path string, encoding encoding.Encoding) (string, error) {
+func ReadAllToStringWithEncoding(path string, enc encoding.Encoding) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
-	decoded, err := encoding.NewDecoder().Bytes(data)
+	decoded, err := enc.NewDecoder().Bytes(data)
 	if err != nil {
 		return "", err
 	}
@@ -32,18 +33,29 @@ func ReadAllToString(path string) (string, error) {
 }
 
 // Read and return all data in file
-func ReadAll(path string) ([]byte, error) {
+func ReadAllBytes(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
+// Read all data from file, into a writer
+func ReadAllToWriter(path string, w io.Writer) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(w, f)
+	return err
+}
+
 // Read line by line from a file with specific, and return a error if read failed.
-func ReadLinesWithEncoding(path string, encoding encoding.Encoding, consume func(line string)) error {
+func ReadLinesWithEncoding(path string, enc encoding.Encoding, consume func(line string)) error {
 	reader, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer iox.Close(reader)
-	return iox.ReadLinesWithEncoding(reader, encoding, consume)
+	return iox.ReadLinesWithEncoding(reader, enc, consume)
 }
 
 // Read line by line from a file, and return a error if read failed.
@@ -57,13 +69,13 @@ func ReadLines(path string, consume func(line string)) error {
 }
 
 // Read all data from a file till EOF, return a lines slice.
-func ReadAllLinesWithEncoding(path string, encoding encoding.Encoding) ([]string, error) {
+func ReadAllLinesWithEncoding(path string, enc encoding.Encoding) ([]string, error) {
 	reader, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer iox.Close(reader)
-	return iox.ReadAllLinesWithEncoding(reader, encoding)
+	return iox.ReadAllLinesWithEncoding(reader, enc)
 }
 
 // Read all data from a file till EOF, return a lines slice.
@@ -123,7 +135,7 @@ func IsDirectory(path string) (bool, error) {
 }
 
 // Write all data to file, and then close. If file already exists, will be override
-func Write(path string, data []byte) error {
+func WriteBytes(path string, data []byte) error {
 	fi, err := os.Create(path)
 	if err != nil {
 		return err
@@ -135,14 +147,25 @@ func Write(path string, data []byte) error {
 
 // Write all string content to file, and then close. If file already exists, will be override
 func WriteString(path string, str string) error {
-	return Write(path, unsafex.StringToBytes(str))
+	return WriteBytes(path, unsafex.StringToBytes(str))
 }
 
 // Write all string content to file using specific encoding, and then close. If file already exists, will be override
-func WriteStringWithEncoding(path string, str string, encoding encoding.Encoding) error {
-	data, err := encoding.NewEncoder().Bytes(unsafex.StringToBytes(str))
+func WriteStringWithEncoding(path string, str string, enc encoding.Encoding) error {
+	data, err := enc.NewEncoder().Bytes(unsafex.StringToBytes(str))
 	if err != nil {
 		return err
 	}
-	return Write(path, data)
+	return WriteBytes(path, data)
+}
+
+// Write all data from a reader, to a file.
+func WriteAllFromReader(path string, r io.Reader) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer iox.Close(f)
+	_, err = io.Copy(f, r)
+	return err
 }

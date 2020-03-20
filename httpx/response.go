@@ -2,15 +2,16 @@ package httpx
 
 import (
 	"encoding/json"
-	"github.com/hsiafan/glow/iox"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/htmlindex"
-	"golang.org/x/text/encoding/unicode"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/hsiafan/glow/iox"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/htmlindex"
+	"golang.org/x/text/encoding/unicode"
 )
 
 // Http response, all info.
@@ -60,7 +61,7 @@ type ResponseInfo struct {
 
 // Read and discard all response body
 func (r *ResponseContext) DiscardBody() (*ResponseInfo, int64, error) {
-	return r.WriteTo(ioutil.Discard)
+	return r.WriteToWriter(ioutil.Discard)
 }
 
 // Read all response body, to bytes
@@ -103,16 +104,15 @@ func (r *ResponseContext) getEncoding() encoding.Encoding {
 			enc, err := htmlindex.Get(param.Value)
 			if err != nil {
 				return nil
-			} else {
-				return enc
 			}
+			return enc
 		}
 	}
 	return nil
 }
 
-// Read all response body, write to target writer.
-func (r *ResponseContext) WriteTo(w io.Writer) (*ResponseInfo, int64, error) {
+// Read all response body data, and write to target writer.
+func (r *ResponseContext) WriteToWriter(w io.Writer) (*ResponseInfo, int64, error) {
 	if r.Err != nil {
 		return nil, 0, r.Err
 	}
@@ -136,7 +136,7 @@ func (r *ResponseContext) WriteToFile(path string) (*ResponseInfo, int64, error)
 	return r.toResponseInfo(), written, err
 }
 
-func (r *ResponseContext) DecodeJson(v interface{}) (*ResponseInfo, error) {
+func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseInfo, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}

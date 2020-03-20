@@ -3,6 +3,7 @@ package flagx
 import (
 	"errors"
 	"fmt"
+	"os"
 )
 
 // CompositeCommand
@@ -10,6 +11,7 @@ type CompositeCommand struct {
 	Name        string       // the command name
 	Description string       // the description
 	subCommands []subCommand // sub commands
+	hasHelp     bool         // if add help command
 }
 
 // Create new CompositeCommand
@@ -30,16 +32,28 @@ func (c *CompositeCommand) AddHelpCommand() {
 	if err != nil {
 		panic(err)
 	}
+	c.hasHelp = true
 	c.AddSubCommand(cmd, func() error {
 		c.ShowUsage()
 		return nil
 	})
 }
 
-// Parse arguments
+// Parse commandline passed arguments, and execute command
+func (c *CompositeCommand) ParseOsArgsAndExecute() error {
+	return c.ParseAndExecute(os.Args[1:])
+}
+
+// Parse arguments, and execute command
 func (c *CompositeCommand) ParseAndExecute(arguments []string) error {
 	if len(arguments) == 0 {
+		if c.hasHelp {
+			arguments = []string{"help"}
+		}
 		return errors.New("should specify a sub command")
+	}
+	if len(arguments) == 1 && (arguments[0] == "-h" || arguments[0] == "-help") {
+		arguments[0] = "help"
 	}
 	for _, sc := range c.subCommands {
 		if sc.command.Name == arguments[0] {

@@ -1,9 +1,10 @@
 package httpx
 
 import (
-	"golang.org/x/text/encoding"
 	"net/http"
 	"strings"
+
+	"golang.org/x/text/encoding"
 )
 
 // For custom Http Request
@@ -86,6 +87,14 @@ func AddCookies(cookies ...Param) RequestOption {
 func BasicAuth(user, password string) RequestOption {
 	return func(r *http.Request) error {
 		r.SetBasicAuth(user, password)
+		return nil
+	}
+}
+
+// set Host header for reqeust. The host header cannot set by SetHeader
+func SetHost(host string) RequestOption {
+	return func(r *http.Request) error {
+		r.Host = host
 		return nil
 	}
 }
