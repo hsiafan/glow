@@ -11,7 +11,6 @@ type CompositeCommand struct {
 	Name        string     // the command name
 	Description string     // the description
 	subCommands []*Command // sub commands
-	hasHelp     bool       // if add help command
 }
 
 // Create new CompositeCommand
@@ -42,10 +41,7 @@ func (c *CompositeCommand) ParseOsArgsAndExecute() error {
 // Parse arguments, and execute command
 func (c *CompositeCommand) ParseAndExecute(arguments []string) error {
 	if len(arguments) == 0 {
-		if c.hasHelp {
-			arguments = []string{"help"}
-		}
-		return errors.New("should specify a sub command")
+		arguments = []string{"help"}
 	}
 	if len(arguments) == 1 && (arguments[0] == "help" || arguments[0] == "-h" || arguments[0] == "-help") {
 		c.ShowUsage()
