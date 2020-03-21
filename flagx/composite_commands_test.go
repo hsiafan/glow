@@ -7,16 +7,13 @@ import (
 
 func TestCompositeCommand_Parse(t *testing.T) {
 	op := &Option{}
-	cmd, err := NewCommand("my", "", op)
-	assert.NoError(t, err)
-	cmd.Description = "a test cmd"
 
-	ccmd := NewCompositeCommand("your")
-	ccmd.AddHelpCommand()
-	ccmd.AddSubCommand(cmd, func() error {
+	ccmd := NewCompositeCommand("your", "composite command")
+	err := ccmd.AddSubCommand("my", "a test cmd", op, func() error {
 		assert.True(t, op.Update)
 		return nil
 	})
+	assert.NoError(t, err)
 	err = ccmd.ParseAndExecute([]string{"my", "-update", "f0", "f1"})
 	//err = ccmd.ParseAndExecute([]string{"help"})
 	assert.NoError(t, err)

@@ -29,12 +29,14 @@ const (
 type Command struct {
 	Name        string        // the name of this command
 	Description string        // usage message
+	parentCmd   string        // the composite command name, if this is a sub command
 	flagSet     *flag.FlagSet // for internal process
 	argFields   []argFiled    // for storing args field
+	handle      func() error
 }
 
 // Create new command
-func NewCommand(Name string, Description string, option interface{}) (*Command, error) {
+func NewCommand(Name string, Description string, option interface{}, handle func() error) (*Command, error) {
 	flagSet := &flag.FlagSet{}
 
 	v := reflect.ValueOf(option)
@@ -145,6 +147,7 @@ func NewCommand(Name string, Description string, option interface{}) (*Command, 
 		argFields:   argFields,
 		Name:        Name,
 		Description: Description,
+		handle:      handle,
 	}
 
 	flagSet.Usage = func() {
@@ -154,7 +157,11 @@ func NewCommand(Name string, Description string, option interface{}) (*Command, 
 		}
 
 		argDes := argsDesc(argFields)
-		_, _ = fmt.Fprintf(output, "Usage: %s %s\n", cmd.Name, argDes)
+		if cmd.parentCmd != "" {
+			_, _ = fmt.Fprintf(output, "Usage: %s %s %s\n", cmd.parentCmd, cmd.Name, argDes)
+		} else {
+			_, _ = fmt.Fprintf(output, "Usage: %s %s\n", cmd.Name, argDes)
+		}
 
 		flagSet.PrintDefaults()
 	}
@@ -183,13 +190,17 @@ func argsDesc(argFields []argFiled) string {
 }
 
 // Parse commandline passed arguments
-func (c *Command) ParseOsArgs(arguments []string) error {
-	return c.Parse(os.Args[1:])
+func (c *Command) ParseOsArgsAndExecute() error {
+	return c.ParseAndExecute(os.Args[1:])
 }
 
 // Parse arguments
-func (c *Command) Parse(arguments []string) error {
+func (c *Command) ParseAndExecute(arguments []string) error {
 	if err := c.flagSet.Parse(arguments); err != nil {
+		if err == flag.ErrHelp {
+			// already show usage
+			return nil
+		}
 		return err
 	}
 
@@ -217,7 +228,7 @@ func (c *Command) Parse(arguments []string) error {
 			af.value.SetString(args[af.index])
 		}
 	}
-	return nil
+	return c.handle()
 }
 
 func setField(str string, kind reflect.Kind, value reflect.Value) error {

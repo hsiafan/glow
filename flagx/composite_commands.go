@@ -8,35 +8,30 @@ import (
 
 // CompositeCommand
 type CompositeCommand struct {
-	Name        string       // the command name
-	Description string       // the description
-	subCommands []subCommand // sub commands
-	hasHelp     bool         // if add help command
+	Name        string     // the command name
+	Description string     // the description
+	subCommands []*Command // sub commands
+	hasHelp     bool       // if add help command
 }
 
 // Create new CompositeCommand
-func NewCompositeCommand(Name string) *CompositeCommand {
+func NewCompositeCommand(Name string, description string) *CompositeCommand {
 	return &CompositeCommand{
-		Name: Name,
+		Name:        Name,
+		Description: description,
 	}
 }
 
 // Add one sub command
-func (c *CompositeCommand) AddSubCommand(command *Command, handle func() error) {
-	c.subCommands = append(c.subCommands, subCommand{command: command, handle: handle})
-}
-
-// Add a command which is name is help, and print usage
-func (c *CompositeCommand) AddHelpCommand() {
-	cmd, err := NewCommand("help", "show help message", &emptyStruct{})
+func (c *CompositeCommand) AddSubCommand(name string, description string, option interface{},
+	handle func() error) error {
+	command, err := NewCommand(name, description, option, handle)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	c.hasHelp = true
-	c.AddSubCommand(cmd, func() error {
-		c.ShowUsage()
-		return nil
-	})
+	command.parentCmd = c.Name
+	c.subCommands = append(c.subCommands, command)
+	return nil
 }
 
 // Parse commandline passed arguments, and execute command
@@ -52,15 +47,16 @@ func (c *CompositeCommand) ParseAndExecute(arguments []string) error {
 		}
 		return errors.New("should specify a sub command")
 	}
-	if len(arguments) == 1 && (arguments[0] == "-h" || arguments[0] == "-help") {
-		arguments[0] = "help"
+	if len(arguments) == 1 && (arguments[0] == "help" || arguments[0] == "-h" || arguments[0] == "-help") {
+		c.ShowUsage()
+		return nil
 	}
 	for _, sc := range c.subCommands {
-		if sc.command.Name == arguments[0] {
-			if err := sc.command.Parse(arguments[1:]); err != nil {
+		if sc.Name == arguments[0] {
+			if err := sc.ParseAndExecute(arguments[1:]); err != nil {
 				return err
 			}
-			return sc.handle()
+			return nil
 		}
 	}
 	return errors.New("unknown command: " + arguments[0])
@@ -72,17 +68,8 @@ func (c *CompositeCommand) ShowUsage() {
 		fmt.Println(c.Description + "\n")
 	}
 	fmt.Println("Usage:", c.Name)
-	for _, sc := range c.subCommands {
-		command := sc.command
+	for _, command := range c.subCommands {
 		fmt.Println("  ", command.Name)
 		fmt.Println("    ", command.Description)
 	}
-}
-
-type subCommand struct {
-	command *Command
-	handle  func() error
-}
-
-type emptyStruct struct {
 }

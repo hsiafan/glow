@@ -14,10 +14,12 @@ func Test_toFlagName(t *testing.T) {
 
 func TestNewCommandLine(t *testing.T) {
 	op := &Option{}
-	cmd, err := NewCommand("my", "", op)
+	cmd, err := NewCommand("my", "", op, func() error {
+		return nil
+	})
 	assert.NoError(t, err)
 	cmd.Description = "a test cmd"
-	err = cmd.Parse([]string{"-update", "-dry=false", "-name", "kite", "f1", "f2"})
+	err = cmd.ParseAndExecute([]string{"-update", "-dry=false", "-name", "kite", "f1", "f2"})
 	assert.NoError(t, err)
 	assert.True(t, op.Update)
 	assert.False(t, op.Dry)
