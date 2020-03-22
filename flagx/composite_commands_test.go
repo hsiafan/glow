@@ -14,7 +14,6 @@ func TestCompositeCommand_Parse(t *testing.T) {
 		return nil
 	})
 	assert.NoError(t, err)
-	err = ccmd.ParseAndExecute([]string{"my", "-update", "f0", "f1"})
+	ccmd.ParseAndExecute([]string{"my", "-update", "f0", "f1"})
 	//err = ccmd.ParseAndExecute([]string{"help"})
-	assert.NoError(t, err)
 }

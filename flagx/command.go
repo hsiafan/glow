@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"unsafe"
 
 	"github.com/hsiafan/glow/floatx"
@@ -18,12 +19,16 @@ import (
 )
 
 const (
-	nameField         = "name"
-	defaultValueField = "default"
-	descriptionField  = "description"
-	argsField         = "args"
-	indexField        = "index"
+	nameField         = "name"        // the name. if not set, use converted struct filed name
+	defaultValueField = "default"     // the default value
+	descriptionField  = "description" // the usage message
+	argsField         = "args"        // mark field as args param, not option param
+	indexField        = "index"       // the position of args, start from 0, used with argsField tag
+	ignoreFiled       = "ignore"      // for ignore one struct field
 )
+
+// alias command handle function
+type Handle = func() error
 
 // a command line
 type Command struct {
@@ -32,11 +37,11 @@ type Command struct {
 	parentCmd   string        // the composite command name, if this is a sub command
 	flagSet     *flag.FlagSet // for internal process
 	argFields   []argFiled    // for storing args field
-	handle      func() error
+	handle      Handle
 }
 
 // Create new command
-func NewCommand(Name string, Description string, option interface{}, handle func() error) (*Command, error) {
+func NewCommand(Name string, Description string, option interface{}, handle Handle) (*Command, error) {
 	flagSet := &flag.FlagSet{}
 
 	v := reflect.ValueOf(option)
@@ -60,6 +65,15 @@ func NewCommand(Name string, Description string, option interface{}, handle func
 	for i := 0; i < v.NumField(); i++ {
 		fieldValue := v.Field(i)
 		fieldType := v.Type().Field(i)
+
+		ignore, err := reflectx.GetBoolTagValue(fieldType.Tag, ignoreFiled, false)
+		if err != nil {
+			return nil, errors.New("invalid bool value for ignore tag of field:" + fieldType.Name)
+		}
+		if ignore {
+			continue
+		}
+
 		if fieldValue.IsValid() == false || fieldValue.CanSet() == false {
 			return nil, fmt.Errorf("invalid field %v", fieldType.Name)
 		}
@@ -97,37 +111,48 @@ func NewCommand(Name string, Description string, option interface{}, handle func
 		case reflect.Bool:
 			v, err := reflectx.GetBoolTagValue(fieldType.Tag, defaultValueField, false)
 			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
 			}
 			flagSet.BoolVar((*bool)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 		case reflect.Int:
 			v, err := reflectx.GetIntTagValue(fieldType.Tag, defaultValueField, 0)
 			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
 			}
 			flagSet.IntVar((*int)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 		case reflect.Int64:
-			v, err := reflectx.GetInt64TagValue(fieldType.Tag, defaultValueField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+			switch fieldValue.Interface().(type) {
+			case time.Duration:
+				v := reflectx.GetTagValue(fieldType.Tag, defaultValueField, "0")
+				duration, err := time.ParseDuration(v)
+				if err != nil {
+					return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
+				}
+				flagSet.DurationVar((*time.Duration)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, duration, description)
+			default:
+				v, err := reflectx.GetInt64TagValue(fieldType.Tag, defaultValueField, 0)
+				if err != nil {
+					return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
+				}
+				flagSet.Int64Var((*int64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 			}
-			flagSet.Int64Var((*int64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
+
 		case reflect.Uint:
 			v, err := reflectx.GetUIntTagValue(fieldType.Tag, defaultValueField, 0)
 			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
 			}
 			flagSet.UintVar((*uint)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 		case reflect.Uint64:
 			v, err := reflectx.GetUInt64TagValue(fieldType.Tag, defaultValueField, 0)
 			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
 			}
 			flagSet.Uint64Var((*uint64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 		case reflect.Float64:
 			v, err := reflectx.GetFloat64TagValue(fieldType.Tag, defaultValueField, 0)
 			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v", fieldType.Name)
+				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
 			}
 			flagSet.Float64Var((*float64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
 		case reflect.String:
@@ -190,18 +215,19 @@ func argsDesc(argFields []argFiled) string {
 }
 
 // Parse commandline passed arguments
-func (c *Command) ParseOsArgsAndExecute() error {
-	return c.ParseAndExecute(os.Args[1:])
+func (c *Command) ParseOsArgsAndExecute() {
+	c.ParseAndExecute(os.Args[1:])
 }
 
 // Parse arguments
-func (c *Command) ParseAndExecute(arguments []string) error {
+func (c *Command) ParseAndExecute(arguments []string) {
 	if err := c.flagSet.Parse(arguments); err != nil {
 		if err == flag.ErrHelp {
 			// already show usage
-			return nil
+			return
 		}
-		return err
+		c.exitOnError(fmt.Errorf("parse flag error: %w", err))
+		return
 	}
 
 	args := c.flagSet.Args()
@@ -214,21 +240,32 @@ func (c *Command) ParseAndExecute(arguments []string) error {
 
 			for idx, arg := range args {
 				if err := setField(arg, eType.Kind(), slice.Index(idx)); err != nil {
-					return err
+					c.exitOnError(fmt.Errorf("set positional arguments error: %w", err))
+					return
 				}
 			}
 			af.value.Set(slice)
 		default:
 			if af.index >= len(args) {
-				return fmt.Errorf("no enough args, require %v, but got: %v", af.index+1, len(args))
+				c.exitOnError(fmt.Errorf("no enough args, require %v, but got: %v", af.index+1, len(args)))
+				return
 			}
 			if err := setField(args[af.index], af.value.Kind(), af.value); err != nil {
-				return err
+				c.exitOnError(fmt.Errorf("set position args error, postion: %v, error: %w", af.index, err))
+				return
 			}
-			af.value.SetString(args[af.index])
 		}
 	}
-	return c.handle()
+
+	if err := c.handle(); err != nil {
+		c.exitOnError(err)
+	}
+}
+
+func (c *Command) exitOnError(err error) {
+	fmt.Println(err)
+	c.ShowUsage()
+	os.Exit(-1)
 }
 
 func setField(str string, kind reflect.Kind, value reflect.Value) error {
@@ -242,6 +279,15 @@ func setField(str string, kind reflect.Kind, value reflect.Value) error {
 		}
 		value.SetInt(int64(v))
 	case reflect.Int64:
+		switch value.Interface().(type) {
+		case time.Duration:
+			v, err := time.ParseDuration(str)
+			if err != nil {
+				return err
+			}
+			value.Set(reflect.ValueOf(v))
+			return nil
+		}
 		v, err := intx.ParseInt64(str)
 		if err != nil {
 			return err

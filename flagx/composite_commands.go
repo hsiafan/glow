@@ -1,7 +1,6 @@
 package flagx
 
 import (
-	"errors"
 	"fmt"
 	"os"
 )
@@ -23,7 +22,7 @@ func NewCompositeCommand(Name string, description string) *CompositeCommand {
 
 // Add one sub command
 func (c *CompositeCommand) AddSubCommand(name string, description string, option interface{},
-	handle func() error) error {
+	handle Handle) error {
 	command, err := NewCommand(name, description, option, handle)
 	if err != nil {
 		return err
@@ -34,28 +33,27 @@ func (c *CompositeCommand) AddSubCommand(name string, description string, option
 }
 
 // Parse commandline passed arguments, and execute command
-func (c *CompositeCommand) ParseOsArgsAndExecute() error {
-	return c.ParseAndExecute(os.Args[1:])
+func (c *CompositeCommand) ParseOsArgsAndExecute() {
+	c.ParseAndExecute(os.Args[1:])
 }
 
 // Parse arguments, and execute command
-func (c *CompositeCommand) ParseAndExecute(arguments []string) error {
+func (c *CompositeCommand) ParseAndExecute(arguments []string) {
 	if len(arguments) == 0 {
 		arguments = []string{"help"}
 	}
 	if len(arguments) == 1 && (arguments[0] == "help" || arguments[0] == "-h" || arguments[0] == "-help") {
 		c.ShowUsage()
-		return nil
+		return
 	}
 	for _, sc := range c.subCommands {
 		if sc.Name == arguments[0] {
-			if err := sc.ParseAndExecute(arguments[1:]); err != nil {
-				return err
-			}
-			return nil
+			sc.ParseAndExecute(arguments[1:])
+			return
 		}
 	}
-	return errors.New("unknown command: " + arguments[0])
+	fmt.Println("unknown command: " + arguments[0])
+	os.Exit(-1)
 }
 
 // Show usage

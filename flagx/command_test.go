@@ -1,7 +1,9 @@
 package flagx
 
 import (
+	"github.com/hsiafan/glow/timex/durationx"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,23 +21,27 @@ func TestNewCommandLine(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	cmd.Description = "a test cmd"
-	err = cmd.ParseAndExecute([]string{"-update", "-dry=false", "-name", "kite", "f1", "f2"})
+	cmd.ParseAndExecute([]string{"-update", "-dry=false", "-name", "kite", "-timeout", "1m", "file1", "3s"})
 	assert.NoError(t, err)
 	assert.True(t, op.Update)
 	assert.False(t, op.Dry)
 	assert.Equal(t, "kite", op.Name)
-	assert.Equal(t, []string{"f1", "f2"}, op.Files)
-	assert.Equal(t, "f2", op.File)
+	assert.Equal(t, []string{"file1", "3s"}, op.Args)
+	assert.Equal(t, "file1", op.File)
 	assert.Equal(t, 1, op.Age)
+	assert.Equal(t, durationx.Minutes(1), op.Timeout)
+	assert.Equal(t, durationx.Seconds(3), op.Timeout2)
 
 	//cmd.ShowUsage()
 }
 
 type Option struct {
-	Update bool
-	Dry    bool
-	Name   string   `description:"the name"`
-	Age    int      `name:"age" description:"the age" default:"1"`
-	Files  []string `args:"true"`
-	File   string   `args:"true" index:"1"`
+	Update   bool
+	Dry      bool
+	Name     string        `description:"the name"`
+	Age      int           `name:"age" description:"the age" default:"1"`
+	Timeout  time.Duration `default:"0"`
+	Args     []string      `args:"true"`
+	File     string        `args:"true" index:"0"`
+	Timeout2 time.Duration `args:"true" index:"1"`
 }
