@@ -87,7 +87,7 @@ func (r *ResponseContext) ReadAllString() (*ResponseInfo, string, error) {
 		reader = enc.NewDecoder().Reader(reader)
 	}
 
-	content, err := iox.ReadAllToString(reader)
+	content, err := iox.ReadAllString(reader)
 	return r.toResponseInfo(), content, err
 }
 

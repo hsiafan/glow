@@ -30,7 +30,7 @@ const (
 // alias command handle function
 type Handle = func() error
 
-// a command line
+// Command is a command line
 type Command struct {
 	Name        string        // the name of this command
 	Description string        // usage message
@@ -40,7 +40,7 @@ type Command struct {
 	handle      Handle
 }
 
-// Create new command
+// NewCommand create new command
 func NewCommand(Name string, Description string, option interface{}, handle Handle) (*Command, error) {
 	flagSet := &flag.FlagSet{}
 
@@ -214,12 +214,12 @@ func argsDesc(argFields []argFiled) string {
 	return sb.String()
 }
 
-// Parse commandline passed arguments
+// ParseOsArgsAndExecute parse commandline passed arguments, and run handlers
 func (c *Command) ParseOsArgsAndExecute() {
 	c.ParseAndExecute(os.Args[1:])
 }
 
-// Parse arguments
+// ParseAndExecute parse arguments, and run handlers
 func (c *Command) ParseAndExecute(arguments []string) {
 	if err := c.flagSet.Parse(arguments); err != nil {
 		if err == flag.ErrHelp {
@@ -323,7 +323,7 @@ func setField(str string, kind reflect.Kind, value reflect.Value) error {
 	return nil
 }
 
-// show formatted usage message
+// ShowUsage print formatted usage message
 func (c *Command) ShowUsage() {
 	c.flagSet.Usage()
 }

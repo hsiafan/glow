@@ -25,3 +25,8 @@ func ToEpochMills(t time.Time) int64 {
 func CurrentMillis() int64 {
 	return ToEpochMills(time.Now())
 }
+
+// Parse Time string with layout, in local Location
+func ParseLocal(layout string, value string) (time.Time, error) {
+	return time.ParseInLocation(layout, value, time.Local)
+}
