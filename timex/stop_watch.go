@@ -15,12 +15,12 @@ type Stopwatch struct {
 	status      int
 }
 
-// Create new Stopwatch, not started.
+// NewStopwatch create new Stopwatch, not started.
 func NewStopwatch() *Stopwatch {
 	return &Stopwatch{status: statusInit}
 }
 
-// Create new Stopwatch, which is started.
+// NewStopwatchStarted create new Stopwatch, then start it.
 func NewStopwatchStarted() *Stopwatch {
 	return &Stopwatch{
 		startedTime: time.Now(),
@@ -62,7 +62,7 @@ func (w *Stopwatch) Stop() bool {
 	panic("")
 }
 
-// Return elapsed time.
+// Elapsed return elapsed time.
 // If not started, always return zero;
 // If started and not stopped, return time interval from begin time to now;
 // If stopped, return elapsed time duration from started time to stopped time.

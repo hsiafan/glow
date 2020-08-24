@@ -31,15 +31,21 @@ func SplitHostPort(str string) (string, uint16, error) {
 	return host, uint16(port), nil
 }
 
+// HostType is an enum to distinct host type, can be domain, ipv4, or ipv6
 type HostType int8
 
 const (
+	// Not a host
 	ILLEGAL HostType = -1
-	DOMAIN  HostType = 0
-	IPv4    HostType = 1
-	IPv6    HostType = 2
+	// domain host
+	DOMAIN HostType = 0
+	// ipv4 address host
+	IPv4 HostType = 1
+	// ipv6 address host
+	IPv6 HostType = 2
 )
 
+// GetHostType return type for this host
 func GetHostType(host string) HostType {
 	if len(host) == 0 {
 		return ILLEGAL

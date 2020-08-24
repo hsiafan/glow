@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// Net address, which must contains a host part, and an optional port part.
+// Address contains a host part, and an optional port part.
 // This struct is designed to be immutable
 type Address struct {
 	host    string

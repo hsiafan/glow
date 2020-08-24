@@ -10,7 +10,7 @@ import (
 	"golang.org/x/text/encoding"
 )
 
-// Read and return all data as string in file
+// ReadAllToStringWithEncoding read and return all data as string in file
 func ReadAllToStringWithEncoding(path string, enc encoding.Encoding) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -23,7 +23,7 @@ func ReadAllToStringWithEncoding(path string, enc encoding.Encoding) (string, er
 	return string(decoded), err
 }
 
-// Read and return all data as string in file
+// ReadAllToString read and return all data as string in file
 func ReadAllToString(path string) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -32,12 +32,12 @@ func ReadAllToString(path string) (string, error) {
 	return unsafex.BytesToString(data), err
 }
 
-// Read and return all data in file
+// ReadAllBytes read and return all data in file
 func ReadAllBytes(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
-// Read all data from file, into a writer
+// ReadAllToWriter read all data from file, into a writer
 func ReadAllToWriter(path string, w io.Writer) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -68,7 +68,7 @@ func ForEachLine(path string, consume func(line string)) error {
 	return iox.ForEachLine(reader, consume)
 }
 
-// Read all data from a file till EOF, return a lines slice.
+// ReadAllLinesWithEncoding read all data from a file till EOF, return a lines slice.
 func ReadAllLinesWithEncoding(path string, enc encoding.Encoding) ([]string, error) {
 	reader, err := os.Open(path)
 	if err != nil {
@@ -78,7 +78,7 @@ func ReadAllLinesWithEncoding(path string, enc encoding.Encoding) ([]string, err
 	return iox.ReadAllLinesWithEncoding(reader, enc)
 }
 
-// Read all data from a file till EOF, return a lines slice.
+// ReadAllLines read all data from a file till EOF, return a lines slice.
 func ReadAllLines(path string) ([]string, error) {
 	reader, err := os.Open(path)
 	if err != nil {
@@ -100,7 +100,7 @@ func Exists(path string) (bool, error) {
 	return false, err
 }
 
-// Return true if path is exists and is regular file
+// IsFile return true if path is exists and is regular file
 func IsFile(path string) (bool, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
@@ -117,7 +117,7 @@ func IsFile(path string) (bool, error) {
 	}
 }
 
-// Return true if path is exists and is directory
+// IsDirectory return true if path is exists and is directory
 func IsDirectory(path string) (bool, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
@@ -134,7 +134,7 @@ func IsDirectory(path string) (bool, error) {
 	}
 }
 
-// Write all data to file, and then close. If file already exists, will be override
+// WriteBytes write all data to file, and then close. If file already exists, will be override
 func WriteBytes(path string, data []byte) error {
 	fi, err := os.Create(path)
 	if err != nil {
@@ -145,12 +145,13 @@ func WriteBytes(path string, data []byte) error {
 	return err
 }
 
-// Write all string content to file, and then close. If file already exists, will be override
+// WriteString write all string content to file, and then close. If file already exists, will be override
 func WriteString(path string, str string) error {
 	return WriteBytes(path, unsafex.StringToBytes(str))
 }
 
-// Write all string content to file using specific encoding, and then close. If file already exists, will be override
+// WriteStringWithEncoding write all string content to file using specific encoding, and then close.
+// If file already exists, will be override
 func WriteStringWithEncoding(path string, str string, enc encoding.Encoding) error {
 	data, err := enc.NewEncoder().Bytes(unsafex.StringToBytes(str))
 	if err != nil {
@@ -159,7 +160,7 @@ func WriteStringWithEncoding(path string, str string, enc encoding.Encoding) err
 	return WriteBytes(path, data)
 }
 
-// Write all data from a reader, to a file.
+// WriteAllFromReader write all data from a reader, to a file.
 func WriteAllFromReader(path string, r io.Reader) error {
 	f, err := os.Create(path)
 	if err != nil {

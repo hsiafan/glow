@@ -16,17 +16,17 @@ func Epoch(secs int64) time.Time {
 	return time.Unix(secs, 0)
 }
 
-// time to unix epoch millis
+// ToEpochMills convert time to unix epoch millis
 func ToEpochMills(t time.Time) int64 {
 	return t.Unix()*1000 + int64(t.Nanosecond()/1000_000)
 }
 
-// Return unix mills timestamp for now
+// CurrentMillis return unix mills timestamp for now
 func CurrentMillis() int64 {
 	return ToEpochMills(time.Now())
 }
 
-// Parse Time string with layout, in local Location
+// ParseLocal parse time string with layout, in local Location
 func ParseLocal(layout string, value string) (time.Time, error) {
 	return time.ParseInLocation(layout, value, time.Local)
 }
