@@ -48,24 +48,24 @@ func ReadAllToWriter(path string, w io.Writer) error {
 	return err
 }
 
-// Read line by line from a file with specific, and return a error if read failed.
-func ReadLinesWithEncoding(path string, enc encoding.Encoding, consume func(line string)) error {
+// ForEachLineWithEncoding read line by line from a file with specific, and return a error if read failed.
+func ForEachLineWithEncoding(path string, enc encoding.Encoding, consume func(line string)) error {
 	reader, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer iox.Close(reader)
-	return iox.ReadLinesWithEncoding(reader, enc, consume)
+	return iox.ForEachLineWithEncoding(reader, enc, consume)
 }
 
-// Read line by line from a file, and return a error if read failed.
-func ReadLines(path string, consume func(line string)) error {
+// ForEachLine read line by line from a file, and return a error if read failed.
+func ForEachLine(path string, consume func(line string)) error {
 	reader, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer iox.Close(reader)
-	return iox.ReadLines(reader, consume)
+	return iox.ForEachLine(reader, consume)
 }
 
 // Read all data from a file till EOF, return a lines slice.

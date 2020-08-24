@@ -31,7 +31,7 @@ func ReadAll(r io.Reader) ([]byte, error) {
 // The line index pass to function start from 0.
 // If and err occurred during read, return an error. If read all data succeed till and io.EOF, nil error will be
 // returned.
-func ForEachLineWithEncoding(r io.Reader, encoding encoding.Encoding, consume func(idx int, line string)) error {
+func ForEachLineWithEncoding(r io.Reader, encoding encoding.Encoding, consume func(line string)) error {
 	r = encoding.NewDecoder().Reader(r)
 	return ForEachLine(r, consume)
 }
@@ -39,7 +39,7 @@ func ForEachLineWithEncoding(r io.Reader, encoding encoding.Encoding, consume fu
 // ForEachLine read all lines in reader, and call consume function, The line index pass to function start from 0.
 // If and err occurred during read, return an error. If read all data succeed till and io.EOF, nil error will be
 // returned.
-func ForEachLine(r io.Reader, consume func(idx int, line string)) error {
+func ForEachLine(r io.Reader, consume func(line string)) error {
 	lr := NewLineReader(r)
 	return lr.ForEachLine(consume)
 }

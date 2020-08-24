@@ -83,8 +83,7 @@ func (r *LineReader) readLine() ([]byte, error) {
 // ForEachLine read all lines in reader, and call consume function, The line index pass to function start from 0.
 // If and err occurred during read, return an error. If read all data succeed till and io.EOF, nil error will be
 // returned.
-func (r *LineReader) ForEachLine(consume func(idx int, line string)) error {
-	idx := 0
+func (r *LineReader) ForEachLine(consume func(line string)) error {
 	for {
 		line, err := r.ReadLine()
 		if err != nil {
@@ -93,8 +92,7 @@ func (r *LineReader) ForEachLine(consume func(idx int, line string)) error {
 			}
 			return err
 		}
-		consume(idx, line)
-		idx++
+		consume(line)
 	}
 }
 
