@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveStringAt(ptr *[]string, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -17,7 +17,7 @@ func RemoveStringAt(ptr *[]string, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveBoolAt(ptr *[]bool, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -29,7 +29,7 @@ func RemoveBoolAt(ptr *[]bool, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveIntAt(ptr *[]int, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -41,7 +41,7 @@ func RemoveIntAt(ptr *[]int, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveInt64At(ptr *[]int64, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -53,7 +53,7 @@ func RemoveInt64At(ptr *[]int64, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveInt32At(ptr *[]int32, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -65,7 +65,7 @@ func RemoveInt32At(ptr *[]int32, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveUintAt(ptr *[]uint, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -77,7 +77,7 @@ func RemoveUintAt(ptr *[]uint, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveUint64At(ptr *[]uint64, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -89,7 +89,7 @@ func RemoveUint64At(ptr *[]uint64, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveUint32At(ptr *[]uint32, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -101,7 +101,7 @@ func RemoveUint32At(ptr *[]uint32, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveFloat64At(ptr *[]float64, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -113,7 +113,7 @@ func RemoveFloat64At(ptr *[]float64, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveFloat32At(ptr *[]float32, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -125,7 +125,7 @@ func RemoveFloat32At(ptr *[]float32, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveRuneAt(ptr *[]rune, index int) error {
 	slice := *ptr
 	l := len(slice)
@@ -137,7 +137,7 @@ func RemoveRuneAt(ptr *[]rune, index int) error {
 	return nil
 }
 
-// Remove element at index
+// RemoveAt remove element at index
 func RemoveAt(ptr interface{}, index int) error {
 	rv := reflect.ValueOf(ptr)
 	slice := rv.Elem()
@@ -150,8 +150,7 @@ func RemoveAt(ptr interface{}, index int) error {
 	return nil
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveStringIf remove all elements match the given condition
 func RemoveStringIf(ptr *[]string, f func(idx int, v string) bool) {
 	slice := *ptr
 	var target = 0
@@ -166,8 +165,7 @@ func RemoveStringIf(ptr *[]string, f func(idx int, v string) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveBoolIf remove all elements match the given condition
 func RemoveBoolIf(ptr *[]bool, f func(idx int, v bool) bool) {
 	slice := *ptr
 	var target = 0
@@ -182,8 +180,7 @@ func RemoveBoolIf(ptr *[]bool, f func(idx int, v bool) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveIntIf remove all elements match the given condition
 func RemoveIntIf(ptr *[]int, f func(idx int, v int) bool) {
 	slice := *ptr
 	var target = 0
@@ -198,8 +195,7 @@ func RemoveIntIf(ptr *[]int, f func(idx int, v int) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveInt64If remove all elements match the given condition
 func RemoveInt64If(ptr *[]int64, f func(idx int, v int64) bool) {
 	slice := *ptr
 	var target = 0
@@ -214,8 +210,7 @@ func RemoveInt64If(ptr *[]int64, f func(idx int, v int64) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveInt32If remove all elements match the given condition
 func RemoveInt32If(ptr *[]int32, f func(idx int, v int32) bool) {
 	slice := *ptr
 	var target = 0
@@ -230,8 +225,7 @@ func RemoveInt32If(ptr *[]int32, f func(idx int, v int32) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveUintIf remove all elements match the given condition
 func RemoveUintIf(ptr *[]uint, f func(idx int, v uint) bool) {
 	slice := *ptr
 	var target = 0
@@ -246,8 +240,7 @@ func RemoveUintIf(ptr *[]uint, f func(idx int, v uint) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveUint64If remove all elements match the given condition
 func RemoveUint64If(ptr *[]uint64, f func(idx int, v uint64) bool) {
 	slice := *ptr
 	var target = 0
@@ -262,8 +255,7 @@ func RemoveUint64If(ptr *[]uint64, f func(idx int, v uint64) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveUint32If remove all elements match the given condition
 func RemoveUint32If(ptr *[]uint32, f func(idx int, v uint32) bool) {
 	slice := *ptr
 	var target = 0
@@ -278,8 +270,7 @@ func RemoveUint32If(ptr *[]uint32, f func(idx int, v uint32) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveFloat64If remove all elements match the given condition
 func RemoveFloat64If(ptr *[]float64, f func(idx int, v float64) bool) {
 	slice := *ptr
 	var target = 0
@@ -294,8 +285,7 @@ func RemoveFloat64If(ptr *[]float64, f func(idx int, v float64) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveFloat32If remove all elements match the given condition
 func RemoveFloat32If(ptr *[]float32, f func(idx int, v float32) bool) {
 	slice := *ptr
 	var target = 0
@@ -310,8 +300,7 @@ func RemoveFloat32If(ptr *[]float32, f func(idx int, v float32) bool) {
 	}
 }
 
-// Remove element at index
-// Remove all elements match the given condition
+// RemoveRuneIf remove all elements match the given condition
 func RemoveRuneIf(ptr *[]rune, f func(idx int, v rune) bool) {
 	slice := *ptr
 	var target = 0
@@ -326,6 +315,7 @@ func RemoveRuneIf(ptr *[]rune, f func(idx int, v rune) bool) {
 	}
 }
 
+// RemoveIf remove all elements from slice, which math give func
 func RemoveIf(ptr interface{}, f func(idx int, v interface{}) bool) {
 	rv := reflect.ValueOf(ptr)
 	slice := rv.Elem()
@@ -342,7 +332,7 @@ func RemoveIf(ptr interface{}, f func(idx int, v interface{}) bool) {
 	}
 }
 
-// Find first appearance of value. If not found, return -1
+// FindString find first appearance of value. If not found, return -1
 func FindString(slice []string, v string) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -355,7 +345,7 @@ func FindString(slice []string, v string) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindBool find first appearance of value. If not found, return -1
 func FindBool(slice []bool, v bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -368,7 +358,7 @@ func FindBool(slice []bool, v bool) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindInt find first appearance of value. If not found, return -1
 func FindInt(slice []int, v int) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -381,7 +371,7 @@ func FindInt(slice []int, v int) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindInt64 find first appearance of value. If not found, return -1
 func FindInt64(slice []int64, v int64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -394,7 +384,7 @@ func FindInt64(slice []int64, v int64) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindInt32 find first appearance of value. If not found, return -1
 func FindInt32(slice []int32, v int32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -407,7 +397,7 @@ func FindInt32(slice []int32, v int32) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindUint find first appearance of value. If not found, return -1
 func FindUint(slice []uint, v uint) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -420,7 +410,7 @@ func FindUint(slice []uint, v uint) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindUint64 find first appearance of value. If not found, return -1
 func FindUint64(slice []uint64, v uint64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -433,7 +423,7 @@ func FindUint64(slice []uint64, v uint64) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindUint32 find first appearance of value. If not found, return -1
 func FindUint32(slice []uint32, v uint32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -446,7 +436,7 @@ func FindUint32(slice []uint32, v uint32) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindFloat64 find first appearance of value. If not found, return -1
 func FindFloat64(slice []float64, v float64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -459,7 +449,7 @@ func FindFloat64(slice []float64, v float64) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindFloat32 find first appearance of value. If not found, return -1
 func FindFloat32(slice []float32, v float32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -472,7 +462,7 @@ func FindFloat32(slice []float32, v float32) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// FindRune find first appearance of value. If not found, return -1
 func FindRune(slice []rune, v rune) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -485,7 +475,7 @@ func FindRune(slice []rune, v rune) int {
 	return -1
 }
 
-// Find first appearance of value. If not found, return -1
+// Find find first appearance of value. If not found, return -1
 func Find(slice interface{}, v interface{}) int {
 	sc := reflect.ValueOf(slice)
 	if !sc.IsValid() || sc.IsZero() || sc.IsNil() || sc.Len() == 0 {
@@ -500,7 +490,7 @@ func Find(slice interface{}, v interface{}) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindString find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindString(slice []string, v string) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -513,7 +503,7 @@ func ReverseFindString(slice []string, v string) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindBool find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindBool(slice []bool, v bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -526,7 +516,7 @@ func ReverseFindBool(slice []bool, v bool) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindInt find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindInt(slice []int, v int) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -539,7 +529,7 @@ func ReverseFindInt(slice []int, v int) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindInt64 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindInt64(slice []int64, v int64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -552,7 +542,7 @@ func ReverseFindInt64(slice []int64, v int64) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindInt32 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindInt32(slice []int32, v int32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -565,7 +555,7 @@ func ReverseFindInt32(slice []int32, v int32) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindUint find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindUint(slice []uint, v uint) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -578,7 +568,7 @@ func ReverseFindUint(slice []uint, v uint) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindUint64 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindUint64(slice []uint64, v uint64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -591,7 +581,7 @@ func ReverseFindUint64(slice []uint64, v uint64) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindUint32 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindUint32(slice []uint32, v uint32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -604,7 +594,7 @@ func ReverseFindUint32(slice []uint32, v uint32) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindFloat64 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindFloat64(slice []float64, v float64) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -617,7 +607,7 @@ func ReverseFindFloat64(slice []float64, v float64) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindFloat32 find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindFloat32(slice []float32, v float32) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -630,7 +620,7 @@ func ReverseFindFloat32(slice []float32, v float32) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFindRune find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFindRune(slice []rune, v rune) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -643,7 +633,7 @@ func ReverseFindRune(slice []rune, v rune) int {
 	return -1
 }
 
-// Find next appearance of value, from end to beginning. If not found, return -1
+// ReverseFind find next appearance of value, from end to beginning. If not found, return -1
 func ReverseFind(slice interface{}, v interface{}) int {
 	sc := reflect.ValueOf(slice)
 	if !sc.IsValid() || sc.IsZero() || sc.IsNil() || sc.Len() == 0 {
@@ -658,7 +648,7 @@ func ReverseFind(slice interface{}, v interface{}) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindStringBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindStringBy(slice []string, f func(v string) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -671,7 +661,7 @@ func FindStringBy(slice []string, f func(v string) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindBoolBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindBoolBy(slice []bool, f func(v bool) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -684,7 +674,7 @@ func FindBoolBy(slice []bool, f func(v bool) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindIntBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindIntBy(slice []int, f func(v int) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -697,7 +687,7 @@ func FindIntBy(slice []int, f func(v int) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindInt64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindInt64By(slice []int64, f func(v int64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -710,7 +700,7 @@ func FindInt64By(slice []int64, f func(v int64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindInt32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindInt32By(slice []int32, f func(v int32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -723,7 +713,7 @@ func FindInt32By(slice []int32, f func(v int32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindUintBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindUintBy(slice []uint, f func(v uint) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -736,7 +726,7 @@ func FindUintBy(slice []uint, f func(v uint) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindUint64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindUint64By(slice []uint64, f func(v uint64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -749,7 +739,7 @@ func FindUint64By(slice []uint64, f func(v uint64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindUint32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindUint32By(slice []uint32, f func(v uint32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -762,7 +752,7 @@ func FindUint32By(slice []uint32, f func(v uint32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindFloat64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindFloat64By(slice []float64, f func(v float64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -775,7 +765,7 @@ func FindFloat64By(slice []float64, f func(v float64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindFloat32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindFloat32By(slice []float32, f func(v float32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -788,7 +778,7 @@ func FindFloat32By(slice []float32, f func(v float32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindRuneBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindRuneBy(slice []rune, f func(v rune) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -801,7 +791,7 @@ func FindRuneBy(slice []rune, f func(v rune) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// FindBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func FindBy(slice interface{}, f func(v interface{}) bool) int {
 	sc := reflect.ValueOf(slice)
 	if !sc.IsValid() || sc.IsZero() || sc.IsNil() || sc.Len() == 0 {
@@ -816,7 +806,7 @@ func FindBy(slice interface{}, f func(v interface{}) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindStringBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindStringBy(slice []string, f func(v string) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -829,7 +819,7 @@ func ReverseFindStringBy(slice []string, f func(v string) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindBoolBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindBoolBy(slice []bool, f func(v bool) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -842,7 +832,7 @@ func ReverseFindBoolBy(slice []bool, f func(v bool) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindIntBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindIntBy(slice []int, f func(v int) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -855,7 +845,7 @@ func ReverseFindIntBy(slice []int, f func(v int) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindInt64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindInt64By(slice []int64, f func(v int64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -868,7 +858,7 @@ func ReverseFindInt64By(slice []int64, f func(v int64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindInt32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindInt32By(slice []int32, f func(v int32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -881,7 +871,7 @@ func ReverseFindInt32By(slice []int32, f func(v int32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindUintBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindUintBy(slice []uint, f func(v uint) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -894,7 +884,7 @@ func ReverseFindUintBy(slice []uint, f func(v uint) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindUint64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindUint64By(slice []uint64, f func(v uint64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -907,7 +897,7 @@ func ReverseFindUint64By(slice []uint64, f func(v uint64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindUint32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindUint32By(slice []uint32, f func(v uint32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -920,7 +910,7 @@ func ReverseFindUint32By(slice []uint32, f func(v uint32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindFloat64By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindFloat64By(slice []float64, f func(v float64) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -933,7 +923,7 @@ func ReverseFindFloat64By(slice []float64, f func(v float64) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindFloat32By find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindFloat32By(slice []float32, f func(v float32) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -946,7 +936,7 @@ func ReverseFindFloat32By(slice []float32, f func(v float32) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindRuneBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindRuneBy(slice []rune, f func(v rune) bool) int {
 	if slice == nil || len(slice) == 0 {
 		return -1
@@ -959,7 +949,7 @@ func ReverseFindRuneBy(slice []rune, f func(v rune) bool) int {
 	return -1
 }
 
-// Find next appearance of value matching the condition, from end to beginning. If not found, return -1
+// ReverseFindBy find next appearance of value matching the condition, from end to beginning. If not found, return -1
 func ReverseFindBy(slice interface{}, f func(v interface{}) bool) int {
 	sc := reflect.ValueOf(slice)
 	if !sc.IsValid() || sc.IsZero() || sc.IsNil() || sc.Len() == 0 {

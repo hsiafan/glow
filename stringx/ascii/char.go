@@ -1,16 +1,17 @@
 package ascii
 
-// If ascii char is upper case
+// IsLower return if v is a upper case ascii char.
 func IsUpper(v byte) bool {
 	return 'A' <= v && v <= 'Z'
 }
 
-// If ascii char is lower case
+// IsLower return if v is a lower case ascii char.
 func IsLower(v byte) bool {
 	return 'a' <= v && v <= 'z'
 }
 
-// convert ascii char to upper case
+// ToUpper convert ascii char to upper case.
+// Return v if v is not a lower case ascii character.
 func ToUpper(v byte) byte {
 	if IsLower(v) {
 		return v - 'a' + 'A'
@@ -18,7 +19,8 @@ func ToUpper(v byte) byte {
 	return v
 }
 
-// convert ascii char to upper case
+// ToLower convert ascii char to upper case
+// Return v if v is not a upper case ascii character.
 func ToLower(v byte) byte {
 	if IsUpper(v) {
 		return v - 'A' + 'a'
