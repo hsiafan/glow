@@ -1,72 +1,73 @@
-package vlog
+package vsyslog
 
 import (
 	"errors"
+	"github.com/hsiafan/glow/vlog"
 	"log/syslog"
 	"strconv"
 )
 
-var _ Appender = (*SyslogAppender)(nil)
+var _ vlog.Appender = (*Appender)(nil)
 
-// SyslogAppender write log to syslogd, using go syslog package.
-// This appender always send only raw log message, SyslogAppender will not take effect.
+// Appender write log to syslogd, using go syslog package.
+// This appender always send only raw log message, Appender will not take effect.
 //
-// SyslogAppender will map log levels from vlog to syslog by the following rules:
+// Appender will map log levels from vlog to syslog by the following rules:
 // TRACE		-- LOG_DEBUG
 // DEBUG		-- LOG_DEBUG
 // INFO			-- LOG_INFO
 // WARN			-- LOG_WARNING
 // ERROR		-- LOG_ERR
 // CRITICAL		-- LOG_CRIT
-type SyslogAppender struct {
+type Appender struct {
 	log         *syslog.Writer
-	levelMap    map[Level]syslog.Priority
+	levelMap    map[vlog.Level]syslog.Priority
 	transformer sysLogTransformer
 }
 
 // defaultLevelMap is the default level map from vlog to syslog
-var defaultLevelMap = map[Level]syslog.Priority{
-	Trace:    syslog.LOG_DEBUG,
-	Debug:    syslog.LOG_DEBUG,
-	Info:     syslog.LOG_INFO,
-	Warn:     syslog.LOG_WARNING,
-	Error:    syslog.LOG_ERR,
-	Critical: syslog.LOG_CRIT,
+var defaultLevelMap = map[vlog.Level]syslog.Priority{
+	vlog.Trace:    syslog.LOG_DEBUG,
+	vlog.Debug:    syslog.LOG_DEBUG,
+	vlog.Info:     syslog.LOG_INFO,
+	vlog.Warn:     syslog.LOG_WARNING,
+	vlog.Error:    syslog.LOG_ERR,
+	vlog.Critical: syslog.LOG_CRIT,
 }
 
 type sysLogTransformer struct {
 }
 
-func (st sysLogTransformer) Transform(record LogRecord) AppendEvent {
-	return AppendEvent{Message: record.Message}
+func (st sysLogTransformer) Transform(record vlog.LogRecord) vlog.AppendEvent {
+	return vlog.AppendEvent{Message: record.Message}
 }
 
-// NewSyslogAppender create syslog appender, to system syslog daemon.
-func NewSyslogAppender(tag string) (*SyslogAppender, error) {
+// New create syslog appender, to system syslog daemon.
+func New(tag string) (*Appender, error) {
 	log, err := syslog.New(syslog.LOG_INFO|syslog.LOG_LOCAL0, tag)
 	if err != nil {
 		return nil, err
 	}
-	return &SyslogAppender{log: log, levelMap: defaultLevelMap}, nil
+	return &Appender{log: log, levelMap: defaultLevelMap}, nil
 }
 
-// NewSyslogAppenderToAddress create syslog appender, to a log daemon connected by network address.
-func NewSyslogAppenderToAddress(network string, address string, tag string) (Appender, error) {
+// NewToAddress create syslog appender, to a log daemon connected by network address.
+func NewToAddress(network string, address string, tag string) (vlog.Appender, error) {
 	log, err := syslog.Dial(network, address, syslog.LOG_INFO|syslog.LOG_LOCAL0, tag)
 	if err != nil {
 		return nil, err
 	}
-	return &SyslogAppender{log: log, levelMap: defaultLevelMap}, nil
+	return &Appender{log: log, levelMap: defaultLevelMap}, nil
 }
 
 // SetLevelMap set level map from vlog to syslog, replace the default log level map.
 // This method should be called before appender start to work.
-func (sa *SyslogAppender) SetLevelMap(levelMap map[Level]syslog.Priority) {
+func (sa *Appender) SetLevelMap(levelMap map[vlog.Level]syslog.Priority) {
 	sa.levelMap = levelMap
 }
 
 // Append write one log entry to syslog
-func (sa *SyslogAppender) Append(event AppendEvent) error {
+func (sa *Appender) Append(event vlog.AppendEvent) error {
 	var level = event.Level
 	if priority, ok := sa.levelMap[level]; ok {
 		switch priority {
@@ -96,16 +97,16 @@ func (sa *SyslogAppender) Append(event AppendEvent) error {
 }
 
 // Transformer always return the default, non-
-func (sa *SyslogAppender) Transformer() Transformer {
+func (sa *Appender) Transformer() vlog.Transformer {
 	return sa.transformer
 }
 
-// SetTransformer not take effect for SyslogAppender, which always only send log message
-func (sa *SyslogAppender) SetTransformer(transformer Transformer) {
+// SetTransformer not take effect for Appender, which always only send log message
+func (sa *Appender) SetTransformer(transformer vlog.Transformer) {
 
 }
 
 // Close the syslog connection
-func (sa *SyslogAppender) Close() error {
+func (sa *Appender) Close() error {
 	return sa.log.Close()
 }
