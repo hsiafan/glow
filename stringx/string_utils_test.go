@@ -47,17 +47,17 @@ func TestSubstringBeforeLast(t *testing.T) {
 	assert.Equal(t, "", SubstringBeforeLast("", "t"))
 }
 
-func TestSplitPair(t *testing.T) {
-	first, second := SplitPair("123=est", "=")
+func TestSplitKV(t *testing.T) {
+	first, second := Split2("123=est", "=")
 	assert.Equal(t, "123", first)
 	assert.Equal(t, "est", second)
-	first, second = SplitPair("123test", "=")
+	first, second = Split2("123test", "=")
 	assert.Equal(t, "123test", first)
 	assert.Equal(t, "", second)
-	first, second = SplitPair("123test", "")
+	first, second = Split2("123test", "")
 	assert.Equal(t, "123test", first)
 	assert.Equal(t, "", second)
-	first, second = SplitPair("", "")
+	first, second = Split2("", "")
 	assert.Equal(t, "", first)
 	assert.Equal(t, "", second)
 }

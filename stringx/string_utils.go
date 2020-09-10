@@ -56,10 +56,10 @@ func SubstringBeforeLast(str string, sep string) string {
 	return str[:index]
 }
 
-// SplitPair split str into two part, by delimiter.
+// Split2 split str into two part, by delimiter.
 // If str dost not contains delimiter, the first returned str is original str, the second is empty str.
 // If delimiter is empty, the first returned str is original str, the second is empty str.
-func SplitPair(str string, delimiter string) (string, string) {
+func Split2(str string, delimiter string) (string, string) {
 	if len(delimiter) == 0 {
 		return str, ""
 	}
