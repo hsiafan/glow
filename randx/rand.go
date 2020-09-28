@@ -104,6 +104,16 @@ func (r *Rand) Int32Within(bound int32) (int32, error) {
 	return v, nil
 }
 
+// MustInt32Within return a random int32 value within range [0, bound).
+// If bound is less than or equals with 0, panics
+func (r *Rand) MustInt32Within(bound int32) int32 {
+	v, err := r.Int32Within(bound)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
 // Int64Within return a random int64 value within range [0, bound).
 // If bound is less than or equals with 0, return an error
 func (r *Rand) Int64Within(bound int64) (int64, error) {
@@ -126,4 +136,14 @@ func (r *Rand) Int64Within(bound int64) (int64, error) {
 		}
 	}
 	return v, nil
+}
+
+// MustInt64Within return a random int64 value within range [0, bound).
+// If bound is less than or equals with 0, panics
+func (r *Rand) MustInt64Within(bound int64) int64 {
+	v, err := r.Int64Within(bound)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }

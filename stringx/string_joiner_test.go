@@ -12,7 +12,7 @@ func TestJoiner_Add(t *testing.T) {
 		Separator: ",",
 	}
 	var testStringer testStringer
-	str := joiner.Add2([]byte("testAdd")).Add("testString").AddInt(1).AddUint(2).
+	str := joiner.AddBytes([]byte("testAdd")).Add("testString").AddInt(1).AddUint(2).
 		AddInt64(3).AddUint64(4).AddStringer(testStringer).AddAny(1234).
 		String()
 	assert.Equal(t, "[testAdd,testString,1,2,3,4,test,1234]", str)

@@ -3,21 +3,18 @@ package httpx
 import (
 	"crypto/tls"
 	"errors"
-	"io"
+	"github.com/hsiafan/glow/timex"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"time"
 
-	"github.com/hsiafan/glow/httpx/header"
-	"github.com/hsiafan/glow/iox"
-	"github.com/hsiafan/glow/timex/durationx"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/htmlindex"
 )
 
-// Http Client
+// Client means Http Client
 type Client struct {
 	client    *http.Client
 	dialer    *net.Dialer
@@ -26,11 +23,11 @@ type Client struct {
 	userAgent string
 }
 
-// Create new http client
+// NewClient create new http client
 func NewClient(options ...ClientOption) *Client {
 	dialer := &net.Dialer{
-		Timeout:   durationx.Seconds(10),
-		KeepAlive: durationx.Seconds(15), // tcp keep alive
+		Timeout:   timex.SecondsDuration(10),
+		KeepAlive: timex.SecondsDuration(15), // tcp keep alive
 	}
 	tlsConfig := &tls.Config{}
 	transport := &http.Transport{
@@ -45,7 +42,7 @@ func NewClient(options ...ClientOption) *Client {
 		tlsConfig: tlsConfig,
 		client: &http.Client{
 			Transport: transport,
-			Timeout:   durationx.Minutes(2),
+			Timeout:   timex.MinutesDuration(2),
 		},
 	}
 	for _, option := range options {
@@ -55,7 +52,7 @@ func NewClient(options ...ClientOption) *Client {
 	return client
 }
 
-// Send a head request
+// Head send a head request
 func (c *Client) Head(url string, options ...RequestOption) *ResponseContext {
 	req, err := http.NewRequest("HEAD", url, nil)
 	if err != nil {
@@ -64,7 +61,7 @@ func (c *Client) Head(url string, options ...RequestOption) *ResponseContext {
 	return c.Send(req, options...)
 }
 
-// Send a get request
+// Get send a get request
 func (c *Client) Get(url string, options ...RequestOption) *ResponseContext {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -73,7 +70,7 @@ func (c *Client) Get(url string, options ...RequestOption) *ResponseContext {
 	return c.Send(req, options...)
 }
 
-// Send a delete request
+// Delete send a delete request
 func (c *Client) Delete(url string, options ...RequestOption) *ResponseContext {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -82,49 +79,49 @@ func (c *Client) Delete(url string, options ...RequestOption) *ResponseContext {
 	return c.Send(req, options...)
 }
 
-// Send a put request with body
+// Put put send a put request with body
 func (c *Client) Put(url string, body Body, options ...RequestOption) *ResponseContext {
+	if body == nil {
+		body = EmptyBody()
+	}
 	reader, err := body.GetReader()
 	if err != nil {
 		return &ResponseContext{Err: err}
-	}
-	if closer, ok := reader.(io.Closer); ok {
-		defer iox.Close(closer)
 	}
 	req, err := http.NewRequest("PUT", url, reader)
 	if err != nil {
 		return &ResponseContext{Err: err}
 	}
 
-	contentType, err := c.makeContentType(body.ContentType(), body.Encoding())
+	contentType, err := c.makeContentType(body.MimeType(), body.Encoding())
 	if err != nil {
 		return &ResponseContext{Err: err}
 	}
 	if contentType != "" {
-		req.Header.Set(header.ContentType, contentType)
+		req.Header.Set(HeaderContenttype, contentType)
 	}
 	return c.Send(req, options...)
 }
 
-// Send a post request with body
+// Post send a post request with body
 func (c *Client) Post(url string, body Body, options ...RequestOption) *ResponseContext {
+	if body == nil {
+		body = EmptyBody()
+	}
 	reader, err := body.GetReader()
 	if err != nil {
 		return &ResponseContext{Err: err}
-	}
-	if closer, ok := reader.(io.Closer); ok {
-		defer iox.Close(closer)
 	}
 	req, err := http.NewRequest("POST", url, reader)
 	if err != nil {
 		return &ResponseContext{Err: err}
 	}
-	contentType, err := c.makeContentType(body.ContentType(), body.Encoding())
+	contentType, err := c.makeContentType(body.MimeType(), body.Encoding())
 	if err != nil {
 		return &ResponseContext{Err: err}
 	}
 	if contentType != "" {
-		req.Header.Set(header.ContentType, contentType)
+		req.Header.Set(HeaderContenttype, contentType)
 	}
 	return c.Send(req, options...)
 }
@@ -143,9 +140,10 @@ func (c *Client) makeContentType(contentType string, encoding encoding.Encoding)
 	return contentType + "; charset=" + encName, nil
 }
 
+// Send send a http request with options.
 func (c *Client) Send(r *http.Request, options ...RequestOption) *ResponseContext {
 	if c.userAgent != "" {
-		r.Header.Set(header.UserAgent, c.userAgent)
+		r.Header.Set(HeaderUseragent, c.userAgent)
 	}
 	for _, option := range options {
 		if err := option(r); err != nil {
@@ -156,24 +154,24 @@ func (c *Client) Send(r *http.Request, options ...RequestOption) *ResponseContex
 	return &ResponseContext{resp, err}
 }
 
-// Client Option
+// ClientOption for setting http client option.
 type ClientOption func(client *Client)
 
-// Set http client timeout for one request
+// RequestTimeout set http client timeout for one request
 func RequestTimeout(timeout time.Duration) ClientOption {
 	return func(client *Client) {
 		client.client.Timeout = timeout
 	}
 }
 
-// Set tcp dial timeout
+// DialTimeout set tcp dial timeout
 func DialTimeout(timeout time.Duration) ClientOption {
 	return func(client *Client) {
 		client.dialer.Timeout = timeout
 	}
 }
 
-// Enable auto cookie handle (receive, store, send)
+// EnableCookie enable auto cookie handle (receive, store, send)
 func EnableCookie() ClientOption {
 	return func(client *Client) {
 		// New cookie jar should always succeed
@@ -182,14 +180,14 @@ func EnableCookie() ClientOption {
 	}
 }
 
-//prevents the client from requesting compression with an "Accept-Encoding: gzip"
+// DisableCompression prevents the client from requesting compression with an "Accept-Encoding: gzip"
 func DisableCompression() ClientOption {
 	return func(client *Client) {
 		client.transport.DisableCompression = true
 	}
 }
 
-// Disable redirect handle
+// DisableFollowRedirects disable redirect handle
 func DisableFollowRedirects() ClientOption {
 	return func(client *Client) {
 		client.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
@@ -198,42 +196,42 @@ func DisableFollowRedirects() ClientOption {
 	}
 }
 
-// Set max count for all hosts of this client. Default is no limit
+// MaxIdleConns set max count for all hosts of this client. Default is no limit
 func MaxIdleConns(count int) ClientOption {
 	return func(client *Client) {
 		client.transport.MaxIdleConns = count
 	}
 }
 
-// Set max idle connection count for one host. Default is no limit
+// MaxIdleConnsPerHost set max idle connection count for one host. Default is no limit
 func MaxIdleConnsPerHost(count int) ClientOption {
 	return func(client *Client) {
 		client.transport.MaxIdleConnsPerHost = count
 	}
 }
 
-// Set max connection count for one host. Default is no limit
+// MaxConnsPerHost set max connection count for one host. Default is no limit
 func MaxConnsPerHost(count int) ClientOption {
 	return func(client *Client) {
 		client.transport.MaxConnsPerHost = count
 	}
 }
 
-// Set max duration for close idle connections. Default is not timeout
+// IdleConnTimeout set max duration for close idle connections. Default is not timeout
 func IdleConnTimeout(timeout time.Duration) ClientOption {
 	return func(client *Client) {
 		client.transport.IdleConnTimeout = timeout
 	}
 }
 
-// Set max duration for wait response header after write all request. Default is no timeout.
+// ResponseHeaderTimeout set max duration for wait response header after write all request. Default is no timeout.
 func ResponseHeaderTimeout(timeout time.Duration) ClientOption {
 	return func(client *Client) {
 		client.transport.ResponseHeaderTimeout = timeout
 	}
 }
 
-// Set max duration for waiting a server's first response headers after fully
+// ExpectContinueTimeout set max duration for waiting a server's first response headers after fully
 // writing the request headers if the request has an "Expect: 100-continue" header.
 // Default is not timeout
 func ExpectContinueTimeout(timeout time.Duration) ClientOption {
@@ -242,35 +240,35 @@ func ExpectContinueTimeout(timeout time.Duration) ClientOption {
 	}
 }
 
-// Disable Http keep alive (http connection reuse)
+// DisableHTTPKeepAlive disable Http keep alive(which means disable http connection reuse)
 func DisableHTTPKeepAlive() ClientOption {
 	return func(client *Client) {
 		client.transport.DisableKeepAlives = true
 	}
 }
 
-// Disable tcp connection keep alive
+// DisableTCPKeepAlive disable tcp connection keep alive
 func DisableTCPKeepAlive() ClientOption {
 	return func(client *Client) {
 		client.dialer.KeepAlive = -1
 	}
 }
 
-// Do not verify tls certificate chain and server name.
+// DisableTLSVerify disable tls certificate chain and server name verifying.
 func DisableTLSVerify() ClientOption {
 	return func(client *Client) {
 		client.tlsConfig.InsecureSkipVerify = true
 	}
 }
 
-// Set use-agent for this client
+// UserAgent set use-agent for this client
 func UserAgent(userAgent string) ClientOption {
 	return func(client *Client) {
 		client.userAgent = userAgent
 	}
 }
 
-// Set proxy by proxy url.
+// UseProxy set proxy by proxy url.
 // The proxy type is determined by the URL scheme. "http", "https", and "socks5" are supported.
 // If the scheme is empty, "http" is assumed.
 // If Proxy url parse error, no proxy is used.

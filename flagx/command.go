@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/hsiafan/glow/stringx"
 	"os"
 	"reflect"
 	"sort"
@@ -15,7 +16,6 @@ import (
 	"github.com/hsiafan/glow/floatx"
 	"github.com/hsiafan/glow/intx"
 	"github.com/hsiafan/glow/reflectx"
-	"github.com/hsiafan/glow/stringx/ascii"
 )
 
 const (
@@ -340,11 +340,11 @@ func toFlagName(filedName string) string {
 
 	for i := 0; i < len(filedName); i++ {
 		c := filedName[i]
-		if ascii.IsUpper(c) {
+		if stringx.IsUpperASCII(c) {
 			if sb.Len() != 0 {
 				sb.WriteByte('-')
 			}
-			sb.WriteByte(ascii.ToLower(c))
+			sb.WriteByte(stringx.ToLowerASCII(c))
 		} else {
 			sb.WriteByte(c)
 		}

@@ -30,6 +30,11 @@ type StringEntry struct {
 	Value string // the value
 }
 
+// Unpack return contents for convenient assign to multi variables.
+func (s *StringEntry) Unpack() (key, value string) {
+	return s.Key, s.Value
+}
+
 // KVSplitter is a tool to split string with prefix, suffix, and separator into key-value entries.
 //
 // Usage:

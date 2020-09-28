@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hsiafan/glow/httpx/mimetype"
 	"github.com/hsiafan/glow/iox"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -16,22 +15,22 @@ import (
 
 // Http body, with content type
 type Body interface {
-	// return content type of this body
-	ContentType() string
+	// MimeType return content mime type of this body
+	MimeType() string
 
 	// Encoding for body. may be nil
 	Encoding() encoding.Encoding
 
-	// get reader from body
+	// GetReader get a reader for reading body data
 	GetReader() (io.Reader, error)
 }
 
-type hasContentType struct {
-	contentType string
+type hasMimeType struct {
+	mimeType string
 }
 
-func (h *hasContentType) ContentType() string {
-	return h.contentType
+func (h *hasMimeType) MimeType() string {
+	return h.mimeType
 }
 
 type hasEncoding struct {
@@ -46,7 +45,7 @@ var _ Body = (*ReaderBody)(nil)
 
 // Reader body
 type ReaderBody struct {
-	hasContentType
+	hasMimeType
 	hasEncoding
 	reader io.Reader
 }
@@ -63,9 +62,9 @@ func NewBody(reader io.Reader, contentType string) *ReaderBody {
 // Create new Body from reader
 func NewBodyWithEncoding(reader io.Reader, contentType string, enc encoding.Encoding) *ReaderBody {
 	return &ReaderBody{
-		hasContentType: hasContentType{contentType},
-		hasEncoding:    hasEncoding{enc},
-		reader:         reader,
+		hasMimeType: hasMimeType{contentType},
+		hasEncoding: hasEncoding{enc},
+		reader:      reader,
 	}
 }
 
@@ -74,7 +73,7 @@ var _ Body = (*BytesBody)(nil)
 // Byte Array as Body
 type BytesBody struct {
 	hasEncoding
-	hasContentType
+	hasMimeType
 	data []byte
 }
 
@@ -86,9 +85,9 @@ func NewBytesBody(data []byte, contentType string) *BytesBody {
 // Create new Body from bytes
 func NewBytesBodyWithEncoding(data []byte, contentType string, enc encoding.Encoding) *BytesBody {
 	return &BytesBody{
-		hasEncoding:    hasEncoding{enc},
-		hasContentType: hasContentType{contentType},
-		data:           data,
+		hasEncoding: hasEncoding{enc},
+		hasMimeType: hasMimeType{contentType},
+		data:        data,
 	}
 }
 
@@ -104,7 +103,7 @@ var _ Body = (*StringBody)(nil)
 
 // String as Body
 type StringBody struct {
-	hasContentType
+	hasMimeType
 	hasEncoding
 	content string
 }
@@ -117,9 +116,9 @@ func NewStringBody(content string, contentType string) *StringBody {
 // Create new Body from bytes
 func NewStringBodyWithEncoding(content string, contentType string, enc encoding.Encoding) *StringBody {
 	return &StringBody{
-		hasEncoding:    hasEncoding{enc},
-		hasContentType: hasContentType{contentType},
-		content:        content,
+		hasEncoding: hasEncoding{enc},
+		hasMimeType: hasMimeType{contentType},
+		content:     content,
 	}
 }
 
@@ -152,8 +151,8 @@ func NewJSONBodyWithEncoding(value interface{}, enc encoding.Encoding) *JSONBody
 	}
 }
 
-func (j *JSONBody) ContentType() string {
-	return mimetype.JSON
+func (j *JSONBody) MimeType() string {
+	return MimetypeJson
 }
 
 func (j *JSONBody) GetReader() (io.Reader, error) {
@@ -189,8 +188,8 @@ func NewFormBodyWithEncoding(params []*Param, enc encoding.Encoding) *FormBody {
 	}
 }
 
-func (f *FormBody) ContentType() string {
-	return mimetype.FormEncoded
+func (f *FormBody) MimeType() string {
+	return MimetypeFormEncoded
 }
 
 func (f *FormBody) GetReader() (io.Reader, error) {
@@ -198,7 +197,7 @@ func (f *FormBody) GetReader() (io.Reader, error) {
 		return iox.EmptyReader(), nil
 	}
 	var buf strings.Builder
-	err := EncodeParamsTo(f.params, f.enc, buf)
+	err := EncodeParamsTo(buf, f.enc, f.params...)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +228,7 @@ func (m *MultiPartBody) Encoding() encoding.Encoding {
 	return nil
 }
 
-func (m *MultiPartBody) ContentType() string {
+func (m *MultiPartBody) MimeType() string {
 	return m.mwriter.FormDataContentType()
 }
 
@@ -270,4 +269,25 @@ func (m *MultiPartBody) GetReader() (io.Reader, error) {
 		}
 	}()
 	return m.reader, nil
+}
+
+// A empty http body
+type emptyBody struct {
+}
+
+func (e *emptyBody) MimeType() string {
+	return ""
+}
+
+func (e *emptyBody) Encoding() encoding.Encoding {
+	return nil
+}
+
+func (e *emptyBody) GetReader() (io.Reader, error) {
+	return nil, nil
+}
+
+// EmptyBody return an empty http Body
+func EmptyBody() Body {
+	return &emptyBody{}
 }

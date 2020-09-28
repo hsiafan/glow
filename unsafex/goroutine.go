@@ -8,6 +8,7 @@ import (
 )
 
 // CurrentGoroutineId get current goroutine id by walk stack.
+// This func get goroutine id by parse current stack string, the performance is not so good.
 func CurrentGoroutineId() int64 {
 	var buf [64]byte
 	n := runtime.Stack(buf[:], false)

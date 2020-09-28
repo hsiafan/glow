@@ -14,14 +14,14 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
-// Http response, all info.
+// ResponseContext carry http response and errors.
 type ResponseContext struct {
 	Response *http.Response
 	Err      error
 }
 
-// Response without body...
-type ResponseInfo struct {
+// ResponseHeader is a http response without body...
+type ResponseHeader struct {
 	Status     string // e.g. "200 OK"
 	StatusCode int    // e.g. 200
 	Proto      string // e.g. "HTTP/1.0"
@@ -52,34 +52,29 @@ type ResponseInfo struct {
 	// After Body.Read has returned io.EOF, Trailer will contain
 	// any trailer values sent by the server.
 	Trailer http.Header
-
-	// Request is the request that was sent to obtain this Response.
-	// Request's Body is nil (having already been consumed).
-	// This is only populated for Client requests.
-	Request *http.Request
 }
 
-// Read and discard all response body
-func (r *ResponseContext) DiscardBody() (*ResponseInfo, int64, error) {
+// DiscardBody read and discard all response body
+func (r *ResponseContext) DiscardBody() (*ResponseHeader, int64, error) {
 	return r.WriteToWriter(ioutil.Discard)
 }
 
-// Read all response body, to bytes
-func (r *ResponseContext) ReadAll() (*ResponseInfo, []byte, error) {
+// ReadAll read all response body, to bytes
+func (r *ResponseContext) ReadAll() (*ResponseHeader, []byte, error) {
 	if r.Err != nil {
 		return nil, nil, r.Err
 	}
 	defer iox.Close(r.Response.Body)
 	data, err := ioutil.ReadAll(r.Response.Body)
-	return r.toResponseInfo(), data, err
+	return r.toResponseHeader(), data, err
 }
 
-// Read all response body, to string
-func (r *ResponseContext) ReadAllString() (*ResponseInfo, string, error) {
+// ReadAllString read all response body, to string
+func (r *ResponseContext) ReadAllString() (*ResponseHeader, string, error) {
 	if r.Err != nil {
 		return nil, "", r.Err
 	}
-	enc := r.getEncoding()
+	enc := r.GetEncoding()
 	var reader io.Reader = r.Response.Body
 	defer iox.Close(r.Response.Body)
 
@@ -88,12 +83,12 @@ func (r *ResponseContext) ReadAllString() (*ResponseInfo, string, error) {
 	}
 
 	content, err := iox.ReadAllString(reader)
-	return r.toResponseInfo(), content, err
+	return r.toResponseHeader(), content, err
 }
 
-// get encoding from response header
-func (r *ResponseContext) getEncoding() encoding.Encoding {
-	contentType := r.Response.Header.Get("Content-Type")
+// GetEncoding get encoding from response header. If header not set charset for content-type, return nil.
+func (r *ResponseContext) GetEncoding() encoding.Encoding {
+	contentType := r.Response.Header.Get(HeaderContenttype)
 	if contentType == "" {
 		return nil
 	}
@@ -112,35 +107,36 @@ func (r *ResponseContext) getEncoding() encoding.Encoding {
 }
 
 // Read all response body data, and write to target writer.
-func (r *ResponseContext) WriteToWriter(w io.Writer) (*ResponseInfo, int64, error) {
+func (r *ResponseContext) WriteToWriter(w io.Writer) (*ResponseHeader, int64, error) {
 	if r.Err != nil {
 		return nil, 0, r.Err
 	}
 	defer iox.Close(r.Response.Body)
 	written, err := io.Copy(w, r.Response.Body)
-	return r.toResponseInfo(), written, err
+	return r.toResponseHeader(), written, err
 }
 
 // Read all response body, write to target writer.
-func (r *ResponseContext) WriteToFile(path string) (*ResponseInfo, int64, error) {
+func (r *ResponseContext) WriteToFile(path string) (*ResponseHeader, int64, error) {
 	if r.Err != nil {
 		return nil, 0, r.Err
 	}
 	defer iox.Close(r.Response.Body)
 	f, err := os.Create(path)
 	if err != nil {
-		return r.toResponseInfo(), 0, err
+		return r.toResponseHeader(), 0, err
 	}
 	defer iox.Close(f)
 	written, err := io.Copy(f, r.Response.Body)
-	return r.toResponseInfo(), written, err
+	return r.toResponseHeader(), written, err
 }
 
-func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseInfo, error) {
+// DecodeJSON decode http body as json, into a value.
+func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseHeader, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}
-	enc := r.getEncoding()
+	enc := r.GetEncoding()
 	var reader io.Reader = r.Response.Body
 	defer iox.Close(r.Response.Body)
 
@@ -149,14 +145,14 @@ func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseInfo, error) {
 	}
 
 	err := json.NewDecoder(reader).Decode(v)
-	return r.toResponseInfo(), err
+	return r.toResponseHeader(), err
 }
 
-func (r *ResponseContext) toResponseInfo() *ResponseInfo {
+func (r *ResponseContext) toResponseHeader() *ResponseHeader {
 	if r.Response == nil {
 		return nil
 	}
-	return &ResponseInfo{
+	return &ResponseHeader{
 		Status:     r.Response.Status,
 		StatusCode: r.Response.StatusCode,
 		Proto:      r.Response.Proto,
@@ -164,6 +160,5 @@ func (r *ResponseContext) toResponseInfo() *ResponseInfo {
 		ProtoMinor: r.Response.ProtoMinor,
 		Header:     r.Response.Header,
 		Trailer:    r.Response.Trailer,
-		Request:    r.Response.Request,
 	}
 }

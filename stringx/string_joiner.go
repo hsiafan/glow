@@ -25,8 +25,8 @@ func (j *Joiner) Reset() *Joiner {
 	return j
 }
 
-// Add2 add new data item to Joiner. The binary data is treated as utf-8 encoded string.
-func (j *Joiner) Add2(data []byte) *Joiner {
+// AddBytes add new data item to Joiner. The binary data is treated as utf-8 encoded string.
+func (j *Joiner) AddBytes(data []byte) *Joiner {
 	j.prepend()
 	j.builder.Write(data)
 	return j

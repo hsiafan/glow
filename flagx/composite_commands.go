@@ -20,7 +20,7 @@ func NewCompositeCommand(Name string, description string) *CompositeCommand {
 	}
 }
 
-// Add2 one sub command
+// AddSubCommand add one sub command
 func (c *CompositeCommand) AddSubCommand(name string, description string, option interface{},
 	handle Handle) error {
 	command, err := NewCommand(name, description, option, handle)

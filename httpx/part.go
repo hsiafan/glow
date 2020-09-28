@@ -10,6 +10,7 @@ const (
 	filePart = 2
 )
 
+// Part is one part of multi-part encoded body, can be key-value param form part, or file part.
 type Part struct {
 	_type int
 	// form part
@@ -21,6 +22,7 @@ type Part struct {
 	reader   io.Reader
 }
 
+// NewFormPart create one new key-value param Part.
 func NewFormPart(filedName string, value string) *Part {
 	return &Part{
 		_type: formPart,
@@ -29,6 +31,7 @@ func NewFormPart(filedName string, value string) *Part {
 	}
 }
 
+// NewFilePart create one new file Part.
 func NewFilePart(filedName string, filename string, reader io.Reader) *Part {
 	return &Part{
 		_type:    filePart,
@@ -38,6 +41,7 @@ func NewFilePart(filedName string, filename string, reader io.Reader) *Part {
 	}
 }
 
+// NewBytesFilePart create one new file Part from binary array.
 func NewBytesFilePart(filedName string, filename string, data []byte) *Part {
 	return &Part{
 		_type:    filePart,
