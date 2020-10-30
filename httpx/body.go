@@ -13,7 +13,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
-// Http body, with content type
+// Body is interface for Http body, with content type
 type Body interface {
 	// MimeType return content mime type of this body
 	MimeType() string
@@ -43,7 +43,7 @@ func (e *hasEncoding) Encoding() encoding.Encoding {
 
 var _ Body = (*ReaderBody)(nil)
 
-// Reader body
+// ReaderBody is a http body contains a io.Reader
 type ReaderBody struct {
 	hasMimeType
 	hasEncoding
@@ -70,19 +70,19 @@ func NewBodyWithEncoding(reader io.Reader, contentType string, enc encoding.Enco
 
 var _ Body = (*BytesBody)(nil)
 
-// Byte Array as Body
+// BytesBody is a http body contains byte array as content
 type BytesBody struct {
 	hasEncoding
 	hasMimeType
 	data []byte
 }
 
-// Create new Body from bytes
+// NewBytesBody create new Body from bytes, providing mimetype
 func NewBytesBody(data []byte, contentType string) *BytesBody {
 	return NewBytesBodyWithEncoding(data, contentType, nil)
 }
 
-// Create new Body from bytes
+// NewBytesBodyWithEncoding create new Body from bytes, and provide mimetype, and encoding
 func NewBytesBodyWithEncoding(data []byte, contentType string, enc encoding.Encoding) *BytesBody {
 	return &BytesBody{
 		hasEncoding: hasEncoding{enc},
@@ -101,19 +101,19 @@ func (b *BytesBody) GetReader() (io.Reader, error) {
 
 var _ Body = (*StringBody)(nil)
 
-// String as Body
+// StringBody is a http body has string value
 type StringBody struct {
 	hasMimeType
 	hasEncoding
 	content string
 }
 
-// Create new Body from bytes
+// NewStringBody create new Body from strubg
 func NewStringBody(content string, contentType string) *StringBody {
 	return NewStringBodyWithEncoding(content, contentType, unicode.UTF8)
 }
 
-// Create new Body from bytes
+// NewStringBodyWithEncoding create new Body from string
 func NewStringBodyWithEncoding(content string, contentType string, enc encoding.Encoding) *StringBody {
 	return &StringBody{
 		hasEncoding: hasEncoding{enc},
@@ -132,18 +132,18 @@ func (s *StringBody) GetReader() (io.Reader, error) {
 
 var _ Body = (*JSONBody)(nil)
 
-// Body marshal value as json
+// JSONBody is http body, marshal value as json
 type JSONBody struct {
 	hasEncoding
 	value interface{}
 }
 
-// Create new Body from value, marshall to json
+// NewJSONBody create new Body from value, marshall to json
 func NewJSONBody(value interface{}) *JSONBody {
 	return NewJSONBodyWithEncoding(value, unicode.UTF8)
 }
 
-// Create new Body from value, marshall to json
+// NewJSONBodyWithEncoding create new Body from value, marshall to json
 func NewJSONBodyWithEncoding(value interface{}, enc encoding.Encoding) *JSONBody {
 	return &JSONBody{
 		hasEncoding: hasEncoding{enc},
@@ -169,18 +169,18 @@ func (j *JSONBody) GetReader() (io.Reader, error) {
 
 var _ Body = (*FormBody)(nil)
 
-// URL encoded form body
+// FormBody is url-encoded-www form body
 type FormBody struct {
 	hasEncoding
 	params []*Param
 }
 
-// Create new form encoded Body from params
+// NewFormBody create new form encoded Body from params
 func NewFormBody(params ...*Param) *FormBody {
 	return NewFormBodyWithEncoding(params, unicode.UTF8)
 }
 
-// Create new form encoded Body from params
+// NewFormBodyWithEncoding create new form encoded Body from params
 func NewFormBodyWithEncoding(params []*Param, enc encoding.Encoding) *FormBody {
 	return &FormBody{
 		hasEncoding: hasEncoding{enc},
@@ -206,6 +206,7 @@ func (f *FormBody) GetReader() (io.Reader, error) {
 
 var _ Body = (*MultiPartBody)(nil)
 
+// MultiPartBody is http multi-part form body
 type MultiPartBody struct {
 	parts   []*Part
 	reader  *io.PipeReader
@@ -213,7 +214,7 @@ type MultiPartBody struct {
 	mwriter *multipart.Writer
 }
 
-// Create new multi part body
+// NewMultiPartBody create new multi part body
 func NewMultiPartBody(parts []*Part) *MultiPartBody {
 	pr, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
