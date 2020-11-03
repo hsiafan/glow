@@ -21,12 +21,14 @@ func TestNewCommandLine(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	cmd.Description = "a test cmd"
-	cmd.ParseAndExecute([]string{"-update", "-dry=false", "-name", "kite", "-timeout", "1m", "file1", "3s"})
+	cmd.ParseAndExecute([]string{"-update", "-dry=false", "-name", "kite", "-timeout", "1m", "-tags", "1",
+		"-tags", "2", "file1", "3s", "4s"})
 	assert.NoError(t, err)
 	assert.True(t, op.Update)
 	assert.False(t, op.Dry)
 	assert.Equal(t, "kite", op.Name)
-	assert.Equal(t, []string{"file1", "3s"}, op.Args)
+	assert.Equal(t, []int{1, 2}, op.Tags)
+	assert.Equal(t, []string{"4s"}, op.Args)
 	assert.Equal(t, "file1", op.File)
 	assert.Equal(t, 1, op.Age)
 	assert.Equal(t, timex.MinutesDuration(1), op.Timeout)
@@ -37,11 +39,12 @@ func TestNewCommandLine(t *testing.T) {
 
 type Option struct {
 	Update   bool
-	Dry      bool
-	Name     string        `description:"the name"`
-	Age      int           `name:"age" description:"the age" default:"1"`
+	Dry      bool   `default:"true"`
+	Name     string `description:"the name"`
+	Age      int    `name:"age" description:"the age" default:"1"`
+	Tags     []int
 	Timeout  time.Duration `default:"0"`
-	Args     []string      `args:"true"`
-	File     string        `args:"true" index:"0"`
-	Timeout2 time.Duration `args:"true" index:"1"`
+	Args     []string      `flag:"false"`
+	File     string        `flag:"false" index:"0"`
+	Timeout2 time.Duration `flag:"false" index:"1"`
 }

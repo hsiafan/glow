@@ -4,27 +4,25 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/hsiafan/glow/stringx"
-	"os"
-	"reflect"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
-	"unsafe"
-
 	"github.com/hsiafan/glow/floatx"
 	"github.com/hsiafan/glow/intx"
 	"github.com/hsiafan/glow/reflectx"
+	"github.com/hsiafan/glow/stringx"
+	"os"
+	"reflect"
+	"strconv"
+	"strings"
+	"time"
 )
 
 const (
 	nameField         = "name"        // the name. if not set, use converted struct filed name
 	defaultValueField = "default"     // the default value
 	descriptionField  = "description" // the usage message
-	argsField         = "args"        // mark field as args param, not option param
-	indexField        = "index"       // the position of args, start from 0, used with argsField tag
+	flagField         = "flag"        // if is a flag arg(true) or a non-flag arg(false), default is true.
+	indexField        = "index"       // the position of non-flag args, start from 0. If a field with slice type, set args true, and leave index not set, will receive all non-consumed non-flag args.
 	ignoreFiled       = "ignore"      // for ignore one struct field
+	requiredField     = "required"    // If this args is required(true|false). Default is false. If default value is set, the required filed will be ignored.
 )
 
 // alias command handle function
@@ -32,12 +30,14 @@ type Handle = func() error
 
 // Command is a command line
 type Command struct {
-	Name        string        // the name of this command
-	Description string        // usage message
-	parentCmd   string        // the composite command name, if this is a sub command
-	flagSet     *flag.FlagSet // for internal process
-	argFields   []argFiled    // for storing args field
-	handle      Handle
+	Name             string                      // the name of this command
+	Description      string                      // usage message
+	parentCmd        string                      // the composite command name, if this is a sub command
+	flagSet          *flag.FlagSet               // for internal process
+	flagFields       []*fieldFlagValue           // flag field
+	positionalFields map[int]*positionalArgField // for storing positional non-flag args field
+	remainFields     *remainedArgsField          // for storing remained non-flag args
+	handle           Handle
 }
 
 // NewCommand create new command
@@ -60,7 +60,10 @@ func NewCommand(Name string, Description string, option interface{}, handle Hand
 	if v.Kind() != reflect.Struct {
 		return nil, errors.New("option should be a struct")
 	}
-	var argFields []argFiled
+
+	var fieldFlagValues []*fieldFlagValue
+	var positionalArgFields = map[int]*positionalArgField{}
+	var raf *remainedArgsField
 
 	for i := 0; i < v.NumField(); i++ {
 		fieldValue := v.Field(i)
@@ -78,101 +81,103 @@ func NewCommand(Name string, Description string, option interface{}, handle Hand
 			return nil, fmt.Errorf("invalid field %v", fieldType.Name)
 		}
 
-		var fieldName string
+		//TODO: check field type
+
+		var flagName string
 		tagName := fieldType.Tag.Get(nameField)
 		if tagName != "" {
-			fieldName = tagName
+			flagName = tagName
 		} else {
-			fieldName = toFlagName(fieldType.Name)
+			flagName = toFlagName(fieldType.Name)
 		}
 
-		description := fieldType.Tag.Get(descriptionField)
-		isArg, err := reflectx.GetBoolTagValue(fieldType.Tag, argsField, false)
+		isFlagArg, err := reflectx.GetBoolTagValue(fieldType.Tag, flagField, true)
 		if err != nil {
-			return nil, fmt.Errorf("struct tag of tags is not valid, field name: %v", fieldType.Name)
+			return nil, fmt.Errorf("struct tag of flag is not valid, field name: %v", fieldType.Name)
+		}
+		required, err := reflectx.GetBoolTagValue(fieldType.Tag, requiredField, false)
+		if err != nil {
+			return nil, fmt.Errorf("struct tag of required is not valid, field name: %v", fieldType.Name)
 		}
 
-		if isArg {
-			index, err := reflectx.GetIntTagValue(fieldType.Tag, indexField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("illegal index value for field %v", fieldType.Name)
+		if !isFlagArg {
+			sv, hasIndex := fieldType.Tag.Lookup(indexField)
+			if hasIndex {
+				index, err := strconv.Atoi(sv)
+				if err != nil || index < 0 {
+					return nil, fmt.Errorf("illegal index value %v for field %v", sv, fieldType.Name)
+				}
+
+				if _, ok := positionalArgFields[index]; ok {
+					return nil, fmt.Errorf("field %v and %v have same index %v", positionalArgFields[index].fieldName, fieldType.Name, index)
+				}
+				if _, ok := positionalArgFields[index]; ok {
+					if index == -1 {
+						return nil, fmt.Errorf("both fields %v and %v want to receive all remains args", positionalArgFields[index].fieldName, fieldType.Name)
+					} else {
+						return nil, fmt.Errorf("both fields %v and %v have same index %v", positionalArgFields[index].fieldName, fieldType.Name, index)
+					}
+				}
+				positionalArgFields[index] = &positionalArgField{
+					value:     fieldValue,
+					_type:     fieldType.Type,
+					fieldName: fieldType.Name,
+					name:      flagName,
+					required:  required,
+					index:     index,
+				}
+			} else {
+				if fieldType.Type.Kind() != reflect.Slice {
+					return nil, fmt.Errorf("field %v want to receive all remains args, but is not slice type", fieldType.Name)
+				}
+				if raf != nil {
+					return nil, fmt.Errorf("both fields %v and %v want to receive remained non-flag args", raf.fieldName, fieldType.Name)
+				} else {
+					raf = &remainedArgsField{
+						value:     fieldValue,
+						_type:     fieldType.Type,
+						fieldName: fieldType.Name,
+						name:      flagName,
+					}
+				}
 			}
-			f := argFiled{
-				value: fieldValue,
-				_type: fieldType.Type,
-				name:  fieldName,
-				index: index,
-			}
-			argFields = append(argFields, f)
 			continue
+		} else {
+			defaultValue, hasDefault := fieldType.Tag.Lookup(defaultValueField)
+			var ffv = &fieldFlagValue{
+				name:         flagName,
+				value:        fieldValue,
+				defaultValue: defaultValue,
+				_type:        fieldType.Type,
+				required:     required,
+			}
+			fieldFlagValues = append(fieldFlagValues, ffv)
+			description := fieldType.Tag.Get(descriptionField)
+			if hasDefault {
+				err := setValue(defaultValue, fieldType.Type.Kind(), fieldValue)
+				if err != nil {
+					return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
+				}
+			}
+			flagSet.Var(ffv, flagName, description)
 		}
+	}
 
-		switch fieldValue.Kind() {
-		case reflect.Bool:
-			v, err := reflectx.GetBoolTagValue(fieldType.Tag, defaultValueField, false)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-			}
-			flagSet.BoolVar((*bool)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.Int:
-			v, err := reflectx.GetIntTagValue(fieldType.Tag, defaultValueField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-			}
-			flagSet.IntVar((*int)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.Int64:
-			switch fieldValue.Interface().(type) {
-			case time.Duration:
-				v := reflectx.GetTagValue(fieldType.Tag, defaultValueField, "0")
-				duration, err := time.ParseDuration(v)
-				if err != nil {
-					return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-				}
-				flagSet.DurationVar((*time.Duration)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, duration, description)
-			default:
-				v, err := reflectx.GetInt64TagValue(fieldType.Tag, defaultValueField, 0)
-				if err != nil {
-					return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-				}
-				flagSet.Int64Var((*int64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-			}
-
-		case reflect.Uint:
-			v, err := reflectx.GetUIntTagValue(fieldType.Tag, defaultValueField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-			}
-			flagSet.UintVar((*uint)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.Uint64:
-			v, err := reflectx.GetUInt64TagValue(fieldType.Tag, defaultValueField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-			}
-			flagSet.Uint64Var((*uint64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.Float64:
-			v, err := reflectx.GetFloat64TagValue(fieldType.Tag, defaultValueField, 0)
-			if err != nil {
-				return nil, fmt.Errorf("invalid default value for field %v, error: %w", fieldType.Name, err)
-			}
-			flagSet.Float64Var((*float64)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.String:
-			v := reflectx.GetTagValue(fieldType.Tag, defaultValueField, "")
-			flagSet.StringVar((*string)(unsafe.Pointer(fieldValue.Addr().Pointer())), fieldName, v, description)
-		case reflect.Ptr:
-			return nil, fmt.Errorf("field can not be pointer: %v", fieldType.Name)
-		case reflect.Slice:
-			return nil, fmt.Errorf("field can not be slice: %v", fieldType.Name)
-		default:
-			return nil, fmt.Errorf("unsupported field type: %v", fieldType.Name)
+	// check if all non-flag args is consumed
+	for idx := 0; idx < len(positionalArgFields); idx++ {
+		if _, ok := positionalArgFields[idx]; !ok {
+			return nil, fmt.Errorf("no field receive %v-th non-flag arg", idx)
 		}
 	}
 
 	cmd := &Command{
-		flagSet:     flagSet,
-		argFields:   argFields,
-		Name:        Name,
-		Description: Description,
-		handle:      handle,
+		flagSet:          flagSet,
+		flagFields:       fieldFlagValues,
+		positionalFields: positionalArgFields,
+		remainFields:     raf,
+		Name:             Name,
+		Description:      Description,
+		handle:           handle,
 	}
 
 	flagSet.Usage = func() {
@@ -181,7 +186,7 @@ func NewCommand(Name string, Description string, option interface{}, handle Hand
 			_, _ = fmt.Fprintln(output, cmd.Description+"\n")
 		}
 
-		argDes := argsDesc(argFields)
+		argDes := argsDesc(raf, positionalArgFields)
 		if cmd.parentCmd != "" {
 			_, _ = fmt.Fprintf(output, "Usage: %s %s %s\n", cmd.parentCmd, cmd.Name, argDes)
 		} else {
@@ -195,31 +200,12 @@ func NewCommand(Name string, Description string, option interface{}, handle Hand
 
 }
 
-func argsDesc(argFields []argFiled) string {
-	for _, af := range argFields {
-		if af.value.Kind() == reflect.Slice {
-			return af.name
-		}
-	}
-	var sb strings.Builder
-	sort.Slice(argFields, func(i, j int) bool {
-		return argFields[i].index < argFields[j].index
-	})
-	for _, f := range argFields {
-		if sb.Len() > 0 {
-			sb.WriteRune(' ')
-		}
-		sb.WriteString(f.name)
-	}
-	return sb.String()
-}
-
-// ParseOsArgsAndExecute parse commandline passed arguments, and run handlers
+// ParseOsArgsAndExecute parse commandline passed arguments, and run handlers.If error occurred, will exit with non-zero code.
 func (c *Command) ParseOsArgsAndExecute() {
 	c.ParseAndExecute(os.Args[1:])
 }
 
-// ParseAndExecute parse arguments, and run handlers
+// ParseAndExecute parse arguments, and run handlers. If error occurred, will exit with non-zero code.
 func (c *Command) ParseAndExecute(arguments []string) {
 	if err := c.flagSet.Parse(arguments); err != nil {
 		if err == flag.ErrHelp {
@@ -230,30 +216,39 @@ func (c *Command) ParseAndExecute(arguments []string) {
 		return
 	}
 
-	args := c.flagSet.Args()
-	for _, af := range c.argFields {
-		switch af.value.Kind() {
-		case reflect.Slice:
-			eType := af._type.Elem()
-			slice := reflect.MakeSlice(af._type, len(args), len(args))
-			//slice := slicePtr.Elem()
+	for _, field := range c.flagFields {
+		if field.required && !field.set {
+			c.exitOnError(fmt.Errorf("flag arg %v required but not set", field.name))
+		}
+	}
 
-			for idx, arg := range args {
-				if err := setField(arg, eType.Kind(), slice.Index(idx)); err != nil {
-					c.exitOnError(fmt.Errorf("set positional arguments error: %w", err))
-					return
-				}
-			}
-			af.value.Set(slice)
-		default:
-			if af.index >= len(args) {
-				c.exitOnError(fmt.Errorf("no enough args, require %v, but got: %v", af.index+1, len(args)))
-				return
-			}
-			if err := setField(args[af.index], af.value.Kind(), af.value); err != nil {
-				c.exitOnError(fmt.Errorf("set position args error, postion: %v, error: %w", af.index, err))
-				return
-			}
+	for _, field := range c.positionalFields {
+		if field.required && !field.set {
+			c.exitOnError(fmt.Errorf("non-flag arg %v[%v] required but not set", field.name, field.index))
+		}
+	}
+
+	// deal with positional args
+	args := c.flagSet.Args()
+	for i, arg := range args {
+		if i >= len(c.positionalFields) {
+			break
+		}
+		af := c.positionalFields[i]
+		if err := af.Set(arg); err != nil {
+			c.exitOnError(fmt.Errorf("set positional arguments error: %w", err))
+			return
+		}
+	}
+
+	if len(args) > len(c.positionalFields) {
+		remainArgs := args[len(c.positionalFields):]
+		if c.remainFields == nil {
+			c.exitOnError(fmt.Errorf("still has args not handled: %v", remainArgs))
+		}
+		if err := c.remainFields.Set(remainArgs); err != nil {
+			c.exitOnError(err)
+			return
 		}
 	}
 
@@ -262,18 +257,147 @@ func (c *Command) ParseAndExecute(arguments []string) {
 	}
 }
 
+// ShowUsage print formatted usage message
+func (c *Command) ShowUsage() {
+	c.flagSet.Usage()
+}
+
 func (c *Command) exitOnError(err error) {
 	fmt.Println(err)
 	c.ShowUsage()
 	os.Exit(-1)
 }
 
-func setField(str string, kind reflect.Kind, value reflect.Value) error {
+// make args description output for usage message
+func argsDesc(raf *remainedArgsField, argFields map[int]*positionalArgField) string {
+	var joiner = stringx.Joiner{
+		Separator: " ",
+	}
+
+	for idx := 0; idx < len(argFields); idx++ {
+		f := argFields[idx]
+		joiner.Add(f.name)
+	}
+
+	if raf != nil {
+		joiner.Add("[" + raf.name + "...]")
+	}
+	return joiner.String()
+}
+
+func toFlagName(filedName string) string {
+	var sb strings.Builder
+
+	for i := 0; i < len(filedName); i++ {
+		c := filedName[i]
+		if stringx.IsUpperASCII(c) {
+			if sb.Len() != 0 {
+				sb.WriteByte('-')
+			}
+			sb.WriteByte(stringx.ToLowerASCII(c))
+		} else {
+			sb.WriteByte(c)
+		}
+	}
+	return sb.String()
+}
+
+var _ flag.Value = (*fieldFlagValue)(nil)
+
+// flag.Value implementation that store value in a struct field
+type fieldFlagValue struct {
+	name         string
+	defaultValue string
+	_type        reflect.Type
+	value        reflect.Value
+	required     bool
+	set          bool
+}
+
+func (f *fieldFlagValue) String() string {
+	return f.defaultValue
+}
+
+func (f *fieldFlagValue) Set(s string) error {
+	if f.set && f._type.Kind() != reflect.Slice {
+		return errors.New("flag arg " + f.name + " already set")
+	}
+	f.set = true
+	if f._type.Kind() != reflect.Slice {
+		return setValue(s, f._type.Kind(), f.value)
+	}
+	newValue := reflect.New(f._type.Elem())
+	if err := setValue(s, f._type.Elem().Kind(), newValue.Elem()); err != nil {
+		return fmt.Errorf("set %v argument error: %w", f.name, err)
+	}
+	f.value.Set(reflect.Append(f.value, newValue.Elem()))
+	return nil
+}
+
+func (f *fieldFlagValue) IsBoolFlag() bool {
+	return f._type.Kind() == reflect.Bool
+}
+
+// for remember non-flag positional args.
+type positionalArgField struct {
+	value     reflect.Value
+	_type     reflect.Type
+	fieldName string // struct field name
+	name      string // flag name
+	index     int    // non-flag arg index
+	required  bool
+	set       bool
+}
+
+func (f *positionalArgField) Set(s string) error {
+	f.set = true
+	return setValue(s, f._type.Kind(), f.value)
+}
+
+// for remember non-flag remained args.
+type remainedArgsField struct {
+	value     reflect.Value
+	_type     reflect.Type
+	fieldName string // struct field name
+	name      string // flag name
+}
+
+func (f *remainedArgsField) Set(args []string) error {
+	slice := reflect.MakeSlice(f._type, len(args), len(args))
+	for idx, arg := range args {
+		if err := setValue(arg, f._type.Elem().Kind(), slice.Index(idx)); err != nil {
+			return fmt.Errorf("set remained arguments error: %w", err)
+		}
+	}
+	f.value.Set(slice)
+	return nil
+}
+
+// set one arg field, the value converted from str input
+func setValue(str string, kind reflect.Kind, value reflect.Value) error {
 	switch kind {
 	case reflect.String:
 		value.SetString(str)
 	case reflect.Int:
 		v, err := intx.ParseInt(str)
+		if err != nil {
+			return err
+		}
+		value.SetInt(int64(v))
+	case reflect.Int8:
+		v, err := intx.ParseInt8(str)
+		if err != nil {
+			return err
+		}
+		value.SetInt(int64(v))
+	case reflect.Int16:
+		v, err := intx.ParseInt16(str)
+		if err != nil {
+			return err
+		}
+		value.SetInt(int64(v))
+	case reflect.Int32:
+		v, err := intx.ParseInt32(str)
 		if err != nil {
 			return err
 		}
@@ -299,12 +423,36 @@ func setField(str string, kind reflect.Kind, value reflect.Value) error {
 			return err
 		}
 		value.SetUint(uint64(v))
+	case reflect.Uint8:
+		v, err := intx.ParseUint8(str)
+		if err != nil {
+			return err
+		}
+		value.SetUint(uint64(v))
+	case reflect.Uint16:
+		v, err := intx.ParseUint16(str)
+		if err != nil {
+			return err
+		}
+		value.SetUint(uint64(v))
+	case reflect.Uint32:
+		v, err := intx.ParseUint32(str)
+		if err != nil {
+			return err
+		}
+		value.SetUint(uint64(v))
 	case reflect.Uint64:
 		v, err := intx.ParseUint64(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(v)
+	case reflect.Float32:
+		v, err := floatx.Parse32(str)
+		if err != nil {
+			return err
+		}
+		value.SetFloat(float64(v))
 	case reflect.Float64:
 		v, err := floatx.Parse64(str)
 		if err != nil {
@@ -321,33 +469,4 @@ func setField(str string, kind reflect.Kind, value reflect.Value) error {
 		return fmt.Errorf("unsupported field type: %v", kind)
 	}
 	return nil
-}
-
-// ShowUsage print formatted usage message
-func (c *Command) ShowUsage() {
-	c.flagSet.Usage()
-}
-
-type argFiled struct {
-	value reflect.Value
-	_type reflect.Type
-	name  string
-	index int
-}
-
-func toFlagName(filedName string) string {
-	var sb strings.Builder
-
-	for i := 0; i < len(filedName); i++ {
-		c := filedName[i]
-		if stringx.IsUpperASCII(c) {
-			if sb.Len() != 0 {
-				sb.WriteByte('-')
-			}
-			sb.WriteByte(stringx.ToLowerASCII(c))
-		} else {
-			sb.WriteByte(c)
-		}
-	}
-	return sb.String()
 }
