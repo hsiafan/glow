@@ -29,61 +29,38 @@ var boundError = errors.New("bound less than or equals zero")
 var boundRangeError = errors.New("low bound larger than/equals high bound")
 var boundOverFlowError = errors.New("bound range overflows int")
 
-// IntWithin return a random value within range [0, bound) if bound larger than 0,
-// return an error if bound is less than or equals 0.
-func (r *Rand) IntWithin(bound int) (int, error) {
+// IntWithin return a random value within range [0, bound) if bound larger than 0.
+// panics bound is less than or equals 0.
+func (r *Rand) IntWithin(bound int) int {
 	if bound <= 0 {
-		return 0, boundError
+		panic(boundError)
 	}
 	if bound <= math.MaxInt32 {
-		v, err := r.Int32Within(int32(bound))
-		return int(v), err
+		v := r.Int32Within(int32(bound))
+		return int(v)
 	}
-	v, err := r.Int64Within(int64(bound))
-	return int(v), err
-}
-
-// MustIntWithin return a random value within range [0, bound) if bound larger than 0.
-// panics bound is less than or equals 0.
-func (r *Rand) MustIntWithin(bound int) int {
-	v, err := r.IntWithin(bound)
-	if err != nil {
-		panic(err)
-	}
-	return v
+	v := r.Int64Within(int64(bound))
+	return int(v)
 }
 
 // IntBetween return a random value within range [low, high) if low less than high,
-// return an error if low is larger than or equals high, or high-low overflows int.
-func (r *Rand) IntBetween(low int, high int) (int, error) {
+// The func panics an error if low is larger than or equals high, or high-low overflows int.
+func (r *Rand) IntBetween(low int, high int) int {
 	if low >= high {
-		return 0, boundRangeError
+		panic(boundRangeError)
 	}
 	if low < 0 && (intx.MaxInt+low) < high {
-		return 0, boundOverFlowError
+		panic(boundOverFlowError)
 	}
-	v, err := r.IntWithin(high - low)
-	if err != nil {
-		return 0, err
-	}
-	return low + v, err
-}
-
-// MustIntBetween return a random value within range [low, high).
-// panics if low is larger than or equals high, or high-low overflows int.
-func (r *Rand) MustIntBetween(low int, high int) int {
-	v, err := r.IntBetween(low, high)
-	if err != nil {
-		panic(err)
-	}
-	return v
+	v := r.IntWithin(high - low)
+	return low + v
 }
 
 // Int32Within return a random int32 value within range [0, bound) if bound larger than 0,
-// return an error if bound is less than or equals 0.
-func (r *Rand) Int32Within(bound int32) (int32, error) {
+// Panics with an error if bound is less than or equals 0.
+func (r *Rand) Int32Within(bound int32) int32 {
 	if bound <= 0 {
-		return 0, boundError
+		panic(boundError)
 	}
 	v := r.Int31()
 	m := bound - 1
@@ -101,24 +78,14 @@ func (r *Rand) Int32Within(bound int32) (int32, error) {
 			}
 		}
 	}
-	return v, nil
-}
-
-// MustInt32Within return a random int32 value within range [0, bound).
-// If bound is less than or equals with 0, panics
-func (r *Rand) MustInt32Within(bound int32) int32 {
-	v, err := r.Int32Within(bound)
-	if err != nil {
-		panic(err)
-	}
 	return v
 }
 
 // Int64Within return a random int64 value within range [0, bound).
-// If bound is less than or equals with 0, return an error
-func (r *Rand) Int64Within(bound int64) (int64, error) {
+// If bound is less than or equals with 0, panics with an error
+func (r *Rand) Int64Within(bound int64) int64 {
 	if bound <= 0 {
-		return 0, boundError
+		panic(boundError)
 	}
 	v := r.Int63()
 	m := bound - 1
@@ -134,16 +101,6 @@ func (r *Rand) Int64Within(bound int64) (int64, error) {
 				break
 			}
 		}
-	}
-	return v, nil
-}
-
-// MustInt64Within return a random int64 value within range [0, bound).
-// If bound is less than or equals with 0, panics
-func (r *Rand) MustInt64Within(bound int64) int64 {
-	v, err := r.Int64Within(bound)
-	if err != nil {
-		panic(err)
 	}
 	return v
 }
