@@ -40,4 +40,7 @@ func TestFormat(t *testing.T) {
 	assert.Equal(t, "00000000A0", Format("{:0>10X}", 160))
 
 	assert.Equal(t, "A0", Format("{:X}", 160))
+
+	assert.Equal(t, "0xa0", Format("{:#x}", 160))
+	assert.Equal(t, "0x000000a0", Format("{:0>10#x}", 160))
 }

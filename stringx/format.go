@@ -44,11 +44,12 @@ func Format(pattern string, params ...interface{}) string {
 	var hasParam = false
 	var hasIndexParam = false
 
-	var paddingChar rune = ' '
+	var paddingChar = ' '
 	var paddingDirection rune = 0
-	var paddingLen int = 0
+	var paddingLen = 0
 
-	var fractionCount int = -1
+	var fractionCount = -1
+	var hasNumberPrefix = false
 	var numberType rune = 0
 
 	for t.hasNext() {
@@ -132,6 +133,10 @@ func Format(pattern string, params ...interface{}) string {
 			}
 			state = stateReadFormatNumberType
 		case stateReadFormatNumberType:
+			if c == '#' {
+				hasNumberPrefix = true
+				c = t.nextRune()
+			}
 			if c == 'b' || c == 'd' || c == 'o' || c == 'x' || c == 'X' || c == 'f' {
 				numberType = c
 			} else if c == '}' {
@@ -146,6 +151,7 @@ func Format(pattern string, params ...interface{}) string {
 			}
 			var str string
 			param := params[paramIndex]
+			var numberPrefix string
 			if numberType == 'd' {
 				if !reflectx.IsInt(param) {
 					panic(fmt.Sprintf("non-int value use int format: %T", param))
@@ -155,21 +161,25 @@ func Format(pattern string, params ...interface{}) string {
 				if !reflectx.IsInt(param) {
 					panic(fmt.Sprintf("non-int value use int format: %T", param))
 				}
+				numberPrefix = "0b"
 				str = fmt.Sprintf("%b", param)
 			} else if numberType == 'o' {
 				if !reflectx.IsInt(param) {
 					panic(fmt.Sprintf("non-int value use int format: %T", param))
 				}
+				numberPrefix = "0o"
 				str = fmt.Sprintf("%o", param)
 			} else if numberType == 'x' {
 				if !reflectx.IsInt(param) {
 					panic(fmt.Sprintf("non-int value use int format: %T", param))
 				}
+				numberPrefix = "0x"
 				str = fmt.Sprintf("%x", param)
 			} else if numberType == 'X' {
 				if !reflectx.IsInt(param) {
 					panic(fmt.Sprintf("non-int value use int format: %T", param))
 				}
+				numberPrefix = "0x"
 				str = fmt.Sprintf("%X", param)
 			} else if numberType == 'f' {
 				if !reflectx.IsFloat(param) {
@@ -184,21 +194,45 @@ func Format(pattern string, params ...interface{}) string {
 				str = fmt.Sprintf("%v", param)
 			}
 
+			if hasNumberPrefix {
+				if numberPrefix == "" {
+					panic("value and format do not has leading 0x/0b/0o")
+				} else {
+					sb.WriteString(numberPrefix)
+					paddingLen = paddingLen - len(numberPrefix)
+				}
+			}
 			// padding
 			if paddingDirection == '>' {
-				str = PadLeft(str, paddingLen, paddingChar)
+				for i := len(str); i < paddingLen; i++ {
+					sb.WriteRune(paddingChar)
+				}
+				sb.WriteString(str)
 			} else if paddingDirection == '<' {
-				str = PadRight(str, paddingLen, paddingChar)
+				sb.WriteString(str)
+				for i := len(str); i < paddingLen; i++ {
+					sb.WriteRune(paddingChar)
+				}
 			} else if paddingDirection == '^' {
-				str = PadToCenter(str, paddingLen, paddingChar)
+				toPad := paddingLen - len(str)
+				for i := 0; i < toPad/2; i++ {
+					sb.WriteRune(paddingChar)
+				}
+				sb.WriteString(str)
+				for i := 0; i < toPad-toPad/2; i++ {
+					sb.WriteRune(paddingChar)
+				}
+			} else {
+				sb.WriteString(str)
 			}
-			sb.WriteString(str)
 			paddingChar = ' '
 			paddingDirection = 0
 			paddingLen = 0
 
 			fractionCount = -1
+			hasNumberPrefix = false
 			numberType = 0
+
 			state = statePlain
 		case stateFirstCurseEnd:
 			if c == '}' {
