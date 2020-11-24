@@ -27,3 +27,13 @@ func ToLower(v byte) byte {
 	}
 	return v
 }
+
+// IsDigit return if is a digit char([0, 9])
+func IsDigit(v byte) bool {
+	return '0' <= v && v <= '9'
+}
+
+// IsDigit return if is a digit char([0, 9], [A, F], [a, f])
+func IsHex(v byte) bool {
+	return '0' <= v && v <= '9' || 'a' <= v && v <= 'f' || 'A' <= v && v <= 'F'
+}

@@ -106,6 +106,25 @@ func PadRight(str string, width int, r rune) string {
 	return builder.String()
 }
 
+// PadToCenter pad str to width, with padding rune at left and right.
+// If str len already equals with or larger than width, return original str.
+func PadToCenter(str string, width int, r rune) string {
+	if len(str) >= width {
+		return str
+	}
+	var builder Builder
+	builder.Grow(width)
+	padded := width - len(str)
+	for i := 0; i < padded/2; i++ {
+		builder.WriteRune(r)
+	}
+	builder.WriteString(str)
+	for i := 0; i < padded-padded/2; i++ {
+		builder.WriteRune(r)
+	}
+	return builder.String()
+}
+
 // Capitalize return str with first char of ascii str upper case.
 func Capitalize(str string) string {
 	if str == "" {
