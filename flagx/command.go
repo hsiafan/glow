@@ -8,6 +8,7 @@ import (
 	"github.com/hsiafan/glow/intx"
 	"github.com/hsiafan/glow/reflectx"
 	"github.com/hsiafan/glow/stringx"
+	"github.com/hsiafan/glow/stringx/ascii"
 	"os"
 	"reflect"
 	"strconv"
@@ -290,11 +291,11 @@ func toFlagName(filedName string) string {
 
 	for i := 0; i < len(filedName); i++ {
 		c := filedName[i]
-		if stringx.IsUpperASCII(c) {
+		if ascii.IsUpper(c) {
 			if sb.Len() != 0 {
 				sb.WriteByte('-')
 			}
-			sb.WriteByte(stringx.ToLowerASCII(c))
+			sb.WriteByte(ascii.ToLower(c))
 		} else {
 			sb.WriteByte(c)
 		}

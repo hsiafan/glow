@@ -58,7 +58,7 @@ func (sp *KVSplitter) Split(s string) []StringEntry {
 	items := strings.Split(s, sp.Separator)
 	entries := make([]StringEntry, len(items))
 	for i, item := range items {
-		key, value := Split2(item, sp.KVSeparator)
+		key, value := split2(item, sp.KVSeparator)
 		entries[i] = StringEntry{key, value}
 	}
 	return entries
@@ -76,8 +76,22 @@ func (sp *KVSplitter) SplitToMap(s string) map[string]string {
 	items := strings.Split(s, sp.Separator)
 	m := map[string]string{}
 	for _, item := range items {
-		key, value := Split2(item, sp.KVSeparator)
+		key, value := split2(item, sp.KVSeparator)
 		m[key] = value
 	}
 	return m
+}
+
+// split2 split str into two part, by delimiter.
+// If str dost not contains delimiter, the first returned str is original str, the second is empty str.
+// If delimiter is empty, the first returned str is original str, the second is empty str.
+func split2(str string, delimiter string) (string, string) {
+	if len(delimiter) == 0 {
+		return str, ""
+	}
+	index := strings.Index(str, delimiter)
+	if index == -1 {
+		return str, ""
+	}
+	return str[:index], str[index+len(delimiter):]
 }
