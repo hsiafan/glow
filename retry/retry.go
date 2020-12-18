@@ -59,12 +59,13 @@ func If(f func(err error) bool) Option {
 
 // Run retry run code until no error, or max retry times exceeded
 func (r *Retry) Run(f func() error) error {
+	backoff := r.backoff.Copy()
 	err := f()
 	if err == nil || !r.shouldRetry(err) {
 		return err
 	}
 	for i := 1; i <= r.retryTimes; i++ {
-		time.Sleep(r.backoff.Interval(i + 1))
+		time.Sleep(backoff.Interval(i + 1))
 		err = f()
 		if err == nil || !r.shouldRetry(err) {
 			return err
