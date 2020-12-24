@@ -44,3 +44,11 @@ func TestFormat(t *testing.T) {
 	assert.Equal(t, "0xa0", Format("{:#x}", 160))
 	assert.Equal(t, "0x000000a0", Format("{:0>10#x}", 160))
 }
+
+func TestFormatNamed(t *testing.T) {
+	s := FormatNamed("{my_name:<2},{your_name:X>3}", NamedParams{
+		"my_name":   1,
+		"your_name": "2",
+	})
+	assert.Equal(t, "1 ,XX2", s)
+}
