@@ -46,9 +46,20 @@ func TestFormat(t *testing.T) {
 }
 
 func TestFormatNamed(t *testing.T) {
-	s := FormatNamed("{my_name:<2},{your_name:X>3}", NamedParams{
-		"my_name":   1,
-		"your_name": "2",
+	s := FormatNamed("{my_name:<2},{your_name:X>3#x}", NamedParams{
+		"my_name":   "1",
+		"your_name": 2,
 	})
-	assert.Equal(t, "1 ,XX2", s)
+	assert.Equal(t, "1 ,0x2", s)
+}
+
+func TestFormatNamed2(t *testing.T) {
+	s := FormatNamed2("{Name1:<2},{Name2:>3#x}", &struct {
+		Name1 string
+		Name2 int
+	}{
+		Name1: "1",
+		Name2: 2,
+	})
+	assert.Equal(t, "1 ,0x2", s)
 }
