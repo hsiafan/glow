@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+type testStringer int
+
+func (s testStringer) String() string {
+	return "test"
+}
+
 func TestJoiner_Add(t *testing.T) {
 	var joiner = Joiner{
 		Prefix:    "[",

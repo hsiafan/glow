@@ -22,3 +22,10 @@ func TryLock(m *sync.Mutex) bool {
 	}
 	return false
 }
+
+// WithLock run code within protection of lock.
+func WithLock(m *sync.Mutex, f func()) {
+	m.Lock()
+	defer m.Unlock()
+	f()
+}

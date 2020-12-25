@@ -1,47 +1,77 @@
 package reflectx
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // IsInt return if is int value
 func IsInt(v interface{}) bool {
-	if _, ok := v.(int); ok {
+	switch v.(type) {
+	case int:
 		return true
-	}
-	if _, ok := v.(int8); ok {
+	case int8:
 		return true
-	}
-	if _, ok := v.(int16); ok {
+	case int16:
 		return true
-	}
-	if _, ok := v.(int32); ok {
+	case int32:
 		return true
-	}
-	if _, ok := v.(int64); ok {
+	case int64:
 		return true
-	}
-	if _, ok := v.(uint); ok {
+	case uint:
 		return true
-	}
-	if _, ok := v.(uint8); ok {
+	case uint8:
 		return true
-	}
-	if _, ok := v.(uint16); ok {
+	case uint16:
 		return true
-	}
-	if _, ok := v.(uint32); ok {
+	case uint32:
 		return true
-	}
-	if _, ok := v.(uint64); ok {
+	case uint64:
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 // IsFloat return if is float value
 func IsFloat(v interface{}) bool {
-	if _, ok := v.(float32); ok {
+	switch v.(type) {
+	case float32:
 		return true
-	}
-	if _, ok := v.(float64); ok {
+	case float64:
 		return true
+	default:
+		return false
 	}
-	return false
+}
+
+// StructToMap convert struct to map, using field name as key, field value as map value.
+// Only exported fields are set into map.
+func StructToMap(value interface{}) map[string]interface{} {
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
+	case reflect.Ptr:
+		if v.IsNil() {
+			return nil
+		}
+		return toMap(v.Elem())
+	case reflect.Struct:
+		return toMap(v)
+	default:
+		panic(fmt.Sprintf("%v is not struct", v.Kind()))
+	}
+}
+
+func toMap(v reflect.Value) map[string]interface{} {
+	if v.Kind() != reflect.Struct {
+		panic(fmt.Sprintf("%v is not struct", v.Kind()))
+	}
+	m := make(map[string]interface{})
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		if f.CanInterface() {
+			m[v.Type().Field(i).Name] = f.Interface()
+		}
+	}
+	return m
 }

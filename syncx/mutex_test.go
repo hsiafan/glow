@@ -14,3 +14,11 @@ func TestTryLock(t *testing.T) {
 	assert.True(t, TryLock(&m))
 	m.Unlock()
 }
+
+func TestWithLock(t *testing.T) {
+	var m sync.Mutex
+	WithLock(&m, func() {
+
+	})
+
+}

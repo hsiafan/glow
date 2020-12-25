@@ -32,9 +32,3 @@ func StringToBytes(str string) []byte {
 	runtime.KeepAlive(&str)
 	return *sp
 }
-
-// CopyString copy a string content, for reducing large string content memory usage when do substring.
-// This method allocate a new string content byte array, thereby allow the larger string to be released by the garbage collector once it is no longer referenced
-func CopyString(s string) string {
-	return string(StringToBytes(s))
-}

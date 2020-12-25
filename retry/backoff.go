@@ -1,6 +1,9 @@
 package retry
 
-import "time"
+import (
+	"github.com/hsiafan/glow/randx"
+	"time"
+)
 
 // Back off strategy for retry
 type Backoff interface {
@@ -14,7 +17,7 @@ type Backoff interface {
 
 var _ Backoff = (*FixedBackoff)(nil)
 
-// FixedBackoff emit fixed Delay for each retry. This backoff can be reused.
+// FixedBackoff emit fixed delay for each retry. This backoff can be reused.
 type FixedBackoff struct {
 	Delay time.Duration
 }
@@ -32,6 +35,35 @@ func NewFixedBackOff(delay time.Duration) *FixedBackoff {
 
 func (b *FixedBackoff) Interval(retryTimes int) time.Duration {
 	return b.Delay
+}
+
+var _ Backoff = (*RandomBackoff)(nil)
+
+// RandomBackoff emit random delay between low and up bounds for each retry. This backoff can be reused.
+type RandomBackoff struct {
+	Low time.Duration
+	Up  time.Duration
+	r   *randx.Rand
+}
+
+func (b *RandomBackoff) Copy() Backoff {
+	return &RandomBackoff{
+		Low: b.Low,
+		Up:  b.Up,
+		r:   randx.New(),
+	}
+}
+
+// NewRandomBackoff create and return new RandomBackoff
+func NewRandomBackoff(low, up time.Duration) *RandomBackoff {
+	return &RandomBackoff{
+		Low: low,
+		Up:  up,
+	}
+}
+
+func (b *RandomBackoff) Interval(retryTimes int) time.Duration {
+	return time.Duration(b.r.Int64Within(int64(b.Up)-int64(b.Low)) + int64(b.Up))
 }
 
 var _ Backoff = (*ExponentialBackoff)(nil)

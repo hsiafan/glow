@@ -4,14 +4,24 @@ import (
 	"strconv"
 )
 
-// Format64 convert float64 to string
+// Format64 convert float64 to string, with decimals nums.
 func Format64(value float64, decimals int) string {
 	return strconv.FormatFloat(value, 'f', decimals, 64)
 }
 
-// Format32 convert float32 to string
+// Format32 convert float32 to string, with decimals nums.
 func Format32(value float32, decimals int) string {
 	return strconv.FormatFloat(float64(value), 'f', decimals, 32)
+}
+
+// SimpleFormat64 convert float64 to string
+func SimpleFormat64(value float64) string {
+	return strconv.FormatFloat(value, 'f', -1, 64)
+}
+
+// SimpleFormat32 convert float32 to string
+func SimpleFormat32(value float32) string {
+	return strconv.FormatFloat(float64(value), 'f', -1, 32)
 }
 
 // Parse64 convert str to float64.

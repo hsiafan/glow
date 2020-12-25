@@ -2,6 +2,8 @@ package stringx
 
 import (
 	"fmt"
+	"github.com/hsiafan/glow/intx"
+	"strings"
 )
 
 // Joiner is a tool to join string with prefix, suffix, and delimiter.
@@ -14,7 +16,7 @@ type Joiner struct {
 	Prefix    string // the prefix of joined string result
 	Suffix    string // the suffix of joined string result
 	Separator string // the delimiter to join str
-	builder   Builder
+	builder   strings.Builder
 	written   bool
 }
 
@@ -42,42 +44,42 @@ func (j *Joiner) Add(str string) *Joiner {
 // AddInt add a new int item to Joiner
 func (j *Joiner) AddInt(value int) *Joiner {
 	j.prepend()
-	j.builder.WriteInt(value)
+	j.builder.WriteString(intx.FormatInt(value))
 	return j
 }
 
 // AddUint add a new uint item to Joiner
 func (j *Joiner) AddUint(value uint) *Joiner {
 	j.prepend()
-	j.builder.WriteUint(value)
+	j.builder.WriteString(intx.FormatUint(value))
 	return j
 }
 
 // AddInt64 add a new int64 item to Joiner
 func (j *Joiner) AddInt64(value int64) *Joiner {
 	j.prepend()
-	j.builder.WriteInt64(value)
+	j.builder.WriteString(intx.FormatInt64(value))
 	return j
 }
 
 // AddUint64 add a new uint64 item to Joiner
 func (j *Joiner) AddUint64(value uint64) *Joiner {
 	j.prepend()
-	j.builder.WriteUint64(value)
+	j.builder.WriteString(intx.FormatUint64(value))
 	return j
 }
 
 // AddStringer add a new stringer item to Joiner
 func (j *Joiner) AddStringer(value fmt.Stringer) *Joiner {
 	j.prepend()
-	j.builder.WriteStringer(value)
+	j.builder.WriteString(value.String())
 	return j
 }
 
 // AddAny add a new value of any type item to Joiner
 func (j *Joiner) AddAny(value interface{}) *Joiner {
 	j.prepend()
-	j.builder.WriteAny(value)
+	j.builder.WriteString(ValueOf(value))
 	return j
 }
 

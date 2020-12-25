@@ -15,6 +15,6 @@ func TestToMap(t *testing.T) {
 		Test2: 2,
 		test3: 10,
 	}
-	assert.Equal(t, map[string]interface{}{"Test": "1", "Test2": 2}, ToMap(s))
-	assert.Equal(t, map[string]interface{}{"Test": "1", "Test2": 2}, ToMap(&s))
+	assert.Equal(t, map[string]interface{}{"Test": "1", "Test2": 2}, StructToMap(s))
+	assert.Equal(t, map[string]interface{}{"Test": "1", "Test2": 2}, StructToMap(&s))
 }

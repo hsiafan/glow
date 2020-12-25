@@ -1,5 +1,7 @@
 package stringx
 
+import "strings"
+
 // KVJoiner is a tool to join string with prefix, suffix, and delimiter
 // Usage:
 //  joiner := &KVJoiner{
@@ -18,41 +20,37 @@ type KVJoiner struct {
 	Suffix      string // the suffix of joined string result
 	Separator   string // the str to join kv items
 	KVSeparator string // the str to join key and value
-	builder     Builder
+	builder     strings.Builder
 	written     bool
 }
 
 // Reset resets the KVJoiner to be empty, can be reused.
-func (j *KVJoiner) Reset() *KVJoiner {
+func (j *KVJoiner) Reset() {
 	j.builder.Reset()
 	j.written = false
-	return j
 }
 
 // Add add a new string key-value entry to KVJoiner
-func (j *KVJoiner) Add(key string, value string) *KVJoiner {
+func (j *KVJoiner) Add(key string, value string) {
 	j.prepend()
 	j.builder.WriteString(key)
 	j.builder.WriteString(j.KVSeparator)
 	j.builder.WriteString(value)
-	return j
 }
 
 // AddAny add a new key-value entry to KVJoiner
-func (j *KVJoiner) AddAny(key interface{}, value interface{}) *KVJoiner {
+func (j *KVJoiner) AddAny(key interface{}, value interface{}) {
 	j.prepend()
-	j.builder.WriteAny(key)
+	j.builder.WriteString(ValueOf(key))
 	j.builder.WriteString(j.KVSeparator)
-	j.builder.WriteAny(value)
-	return j
+	j.builder.WriteString(ValueOf(value))
 }
 
 // AddAny add all key-value items in a map to
-func (j *KVJoiner) AddAll(m map[string]string) *KVJoiner {
+func (j *KVJoiner) AddAll(m map[string]string) {
 	for k, v := range m {
 		j.Add(k, v)
 	}
-	return j
 }
 
 // String join all values as string
