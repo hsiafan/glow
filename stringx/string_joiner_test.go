@@ -28,4 +28,41 @@ func TestJoiner_Add(t *testing.T) {
 
 	joiner.Reset()
 	assert.Equal(t, "[123]", joiner.Add("123").String())
+
+	joiner = Joiner{
+		Prefix:    "[",
+		Suffix:    "]",
+		Separator: ",",
+		OmitNil:   true,
+	}
+	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	assert.Equal(t, "[1]", str)
+
+	joiner = Joiner{
+		Prefix:    "[",
+		Suffix:    "]",
+		Separator: ",",
+		OmitEmpty: true,
+	}
+	str = joiner.Add("1").Add("").String()
+	assert.Equal(t, "[1]", str)
+
+	joiner = Joiner{
+		Prefix:     "[",
+		Suffix:     "]",
+		Separator:  ",",
+		NilToEmpty: true,
+	}
+	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	assert.Equal(t, "[1,,]", str)
+
+	joiner = Joiner{
+		Prefix:     "[",
+		Suffix:     "]",
+		Separator:  ",",
+		OmitEmpty:  true,
+		NilToEmpty: true,
+	}
+	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	assert.Equal(t, "[1]", str)
 }

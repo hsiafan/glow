@@ -6,6 +6,49 @@ import (
 	"strings"
 )
 
+// JoinConfig contains join config for joining string
+type JoinConfig struct {
+	Prefix     string // the prefix of joined string result
+	Suffix     string // the suffix of joined string result
+	Separator  string // the delimiter to join str
+	OmitNil    bool   // if skip nil value
+	OmitEmpty  bool   // if skip empty string
+	NilToEmpty bool   // if trans nil value to empty string
+}
+
+// NewJoiner create and return on new Joiner using the JoinConfig
+func (j *JoinConfig) NewJoiner() *Joiner {
+	return &Joiner{
+		Prefix:     j.Prefix,
+		Suffix:     j.Suffix,
+		Separator:  j.Separator,
+		OmitNil:    j.OmitNil,
+		OmitEmpty:  j.OmitEmpty,
+		NilToEmpty: j.NilToEmpty,
+	}
+}
+
+// Join join string items to one string
+func (j *JoinConfig) Join(strings []string) string {
+	joiner := j.NewJoiner()
+	joiner.AddAll(strings...)
+	return joiner.String()
+}
+
+// JoinStringer join fmt.Stringer items to one string
+func (j *JoinConfig) JoinStringer(stringers []fmt.Stringer) string {
+	joiner := j.NewJoiner()
+	joiner.AddAllStringer(stringers...)
+	return joiner.String()
+}
+
+// JoinStringer join fmt.Stringer items to one string
+func (j *JoinConfig) JoinAny(values []interface{}) string {
+	joiner := j.NewJoiner()
+	joiner.AddAllAny(values...)
+	return joiner.String()
+}
+
 // Joiner is a tool to join string with prefix, suffix, and delimiter.
 //
 // Usage:
@@ -13,11 +56,14 @@ import (
 //  joiner.Add(str)
 //  s := joiner.String()
 type Joiner struct {
-	Prefix    string // the prefix of joined string result
-	Suffix    string // the suffix of joined string result
-	Separator string // the delimiter to join str
-	builder   strings.Builder
-	written   bool
+	Prefix     string // the prefix of joined string result
+	Suffix     string // the suffix of joined string result
+	Separator  string // the delimiter to join str
+	OmitNil    bool   // if skip nil value
+	OmitEmpty  bool   // if skip empty string
+	NilToEmpty bool   // if trans nil value to empty string
+	builder    strings.Builder
+	written    bool
 }
 
 // Reset resets the Joiner to be empty, can be reused.
@@ -29,6 +75,9 @@ func (j *Joiner) Reset() *Joiner {
 
 // AddBytes add new data item to Joiner. The binary data is treated as utf-8 encoded string.
 func (j *Joiner) AddBytes(data []byte) *Joiner {
+	if len(data) == 0 && j.OmitEmpty {
+		return j
+	}
 	j.prepend()
 	j.builder.Write(data)
 	return j
@@ -36,6 +85,9 @@ func (j *Joiner) AddBytes(data []byte) *Joiner {
 
 // Add add a new string item to Joiner
 func (j *Joiner) Add(str string) *Joiner {
+	if len(str) == 0 && j.OmitEmpty {
+		return j
+	}
 	j.prepend()
 	j.builder.WriteString(str)
 	return j
@@ -71,15 +123,35 @@ func (j *Joiner) AddUint64(value uint64) *Joiner {
 
 // AddStringer add a new stringer item to Joiner
 func (j *Joiner) AddStringer(value fmt.Stringer) *Joiner {
-	j.prepend()
-	j.builder.WriteString(value.String())
+	if value == nil && j.OmitNil {
+		return j
+	}
+	if value == nil {
+		if j.NilToEmpty {
+			j.Add("")
+		} else {
+			j.Add(ValueOf(value))
+		}
+	} else {
+		j.Add(value.String())
+	}
 	return j
 }
 
 // AddAny add a new value of any type item to Joiner
 func (j *Joiner) AddAny(value interface{}) *Joiner {
-	j.prepend()
-	j.builder.WriteString(ValueOf(value))
+	if value == nil && j.OmitNil {
+		return j
+	}
+	if value == nil {
+		if j.NilToEmpty {
+			j.Add("")
+		} else {
+			j.Add(ValueOf(value))
+		}
+	} else {
+		j.Add(ValueOf(value))
+	}
 	return j
 }
 
