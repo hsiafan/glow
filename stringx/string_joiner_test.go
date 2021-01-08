@@ -18,16 +18,17 @@ func TestJoiner_Add(t *testing.T) {
 		Separator: ",",
 	}
 	var testStringer testStringer
-	str := joiner.AddBytes([]byte("testAdd")).Add("testString").AddInt(1).AddUint(2).
+	jb := joiner.NewBuffer()
+	str := jb.AddBytes([]byte("testAdd")).Add("testString").AddInt(1).AddUint(2).
 		AddInt64(3).AddUint64(4).AddStringer(testStringer).AddAny(1234).
 		String()
 	assert.Equal(t, "[testAdd,testString,1,2,3,4,test,1234]", str)
 
-	joiner.Reset()
-	assert.Equal(t, "[]", joiner.String())
+	jb.Reset()
+	assert.Equal(t, "[]", jb.String())
 
-	joiner.Reset()
-	assert.Equal(t, "[123]", joiner.Add("123").String())
+	jb.Reset()
+	assert.Equal(t, "[123]", jb.Add("123").String())
 
 	joiner = Joiner{
 		Prefix:    "[",
@@ -35,7 +36,7 @@ func TestJoiner_Add(t *testing.T) {
 		Separator: ",",
 		OmitNil:   true,
 	}
-	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	str = joiner.NewBuffer().Add("1").AddAny(nil).AddStringer(nil).String()
 	assert.Equal(t, "[1]", str)
 
 	joiner = Joiner{
@@ -44,7 +45,7 @@ func TestJoiner_Add(t *testing.T) {
 		Separator: ",",
 		OmitEmpty: true,
 	}
-	str = joiner.Add("1").Add("").String()
+	str = joiner.NewBuffer().Add("1").Add("").String()
 	assert.Equal(t, "[1]", str)
 
 	joiner = Joiner{
@@ -53,7 +54,7 @@ func TestJoiner_Add(t *testing.T) {
 		Separator:  ",",
 		NilToEmpty: true,
 	}
-	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	str = joiner.NewBuffer().Add("1").AddAny(nil).AddStringer(nil).String()
 	assert.Equal(t, "[1,,]", str)
 
 	joiner = Joiner{
@@ -63,6 +64,6 @@ func TestJoiner_Add(t *testing.T) {
 		OmitEmpty:  true,
 		NilToEmpty: true,
 	}
-	str = joiner.Add("1").AddAny(nil).AddStringer(nil).String()
+	str = joiner.NewBuffer().Add("1").AddAny(nil).AddStringer(nil).String()
 	assert.Equal(t, "[1]", str)
 }

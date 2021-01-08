@@ -271,7 +271,7 @@ func (c *Command) exitOnError(err error) {
 
 // make args description output for usage message
 func argsDesc(raf *remainedArgsField, argFields map[int]*positionalArgField) string {
-	var joiner = stringx.Joiner{
+	var joiner = stringx.JoinBuffer{
 		Separator: " ",
 	}
 
