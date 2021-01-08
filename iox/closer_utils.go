@@ -9,3 +9,9 @@ func Close(closer io.Closer) {
 		_ = closer.Close()
 	}
 }
+
+// WithCloser run function, and then close the closer
+func WithCloser(closer io.Closer, f func(io.Closer)) {
+	defer Close(closer)
+	f(closer)
+}
