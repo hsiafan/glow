@@ -271,19 +271,20 @@ func (c *Command) exitOnError(err error) {
 
 // make args description output for usage message
 func argsDesc(raf *remainedArgsField, argFields map[int]*positionalArgField) string {
-	var joiner = stringx.JoinBuffer{
+	var joiner = stringx.Joiner{
 		Separator: " ",
 	}
+	var buffer = joiner.NewBuffer()
 
 	for idx := 0; idx < len(argFields); idx++ {
 		f := argFields[idx]
-		joiner.Add(f.name)
+		buffer.Add(f.name)
 	}
 
 	if raf != nil {
-		joiner.Add("[" + raf.name + "...]")
+		buffer.Add("[" + raf.name + "...]")
 	}
-	return joiner.String()
+	return buffer.String()
 }
 
 func toFlagName(filedName string) string {
