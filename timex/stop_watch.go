@@ -77,3 +77,11 @@ func (w *Stopwatch) Elapsed() time.Duration {
 	}
 	panic("")
 }
+
+// Elapsed return elapsed time by milli-seconds.
+// If not started, always return zero;
+// If started and not stopped, return time interval from begin time to now;
+// If stopped, return elapsed time duration from started time to stopped time.
+func (w *Stopwatch) ElapsedMillis() int64 {
+	return int64(w.Elapsed() / time.Millisecond)
+}
