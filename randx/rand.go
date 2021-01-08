@@ -3,9 +3,9 @@ package randx
 import (
 	"errors"
 	"github.com/hsiafan/glow/intx"
+	"github.com/hsiafan/glow/timex"
 	"math"
 	"math/rand"
-	"time"
 )
 
 // Rand is a rand with more useful methods
@@ -15,7 +15,7 @@ type Rand struct {
 
 // New return a new Rand using timestamp as seed
 func New() *Rand {
-	return NewWithSeed(time.Now().Unix())
+	return NewWithSeed(timex.CurrentMillis())
 }
 
 // NewWithSeed return a new Rand using seed
