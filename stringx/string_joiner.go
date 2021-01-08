@@ -20,7 +20,7 @@ type Joiner struct {
 // NewBuffer create and return one new JoinBuffer for join string using the Joiner
 func (j *Joiner) NewBuffer() *JoinBuffer {
 	return &JoinBuffer{
-		Joiner: *j,
+		joiner: *j,
 	}
 }
 
@@ -52,7 +52,7 @@ func (j *Joiner) JoinAny(values []interface{}) string {
 //  joiner.Add(str)
 //  s := joiner.String()
 type JoinBuffer struct {
-	Joiner
+	joiner  Joiner
 	builder strings.Builder
 	written bool
 }
@@ -66,7 +66,7 @@ func (j *JoinBuffer) Reset() *JoinBuffer {
 
 // AddBytes add new data item to JoinBuffer. The binary data is treated as utf-8 encoded string.
 func (j *JoinBuffer) AddBytes(data []byte) *JoinBuffer {
-	if len(data) == 0 && j.OmitEmpty {
+	if len(data) == 0 && j.joiner.OmitEmpty {
 		return j
 	}
 	j.prepend()
@@ -76,7 +76,7 @@ func (j *JoinBuffer) AddBytes(data []byte) *JoinBuffer {
 
 // Add add a new string item to JoinBuffer
 func (j *JoinBuffer) Add(str string) *JoinBuffer {
-	if len(str) == 0 && j.OmitEmpty {
+	if len(str) == 0 && j.joiner.OmitEmpty {
 		return j
 	}
 	j.prepend()
@@ -114,11 +114,11 @@ func (j *JoinBuffer) AddUint64(value uint64) *JoinBuffer {
 
 // AddStringer add a new stringer item to JoinBuffer
 func (j *JoinBuffer) AddStringer(value fmt.Stringer) *JoinBuffer {
-	if value == nil && j.OmitNil {
+	if value == nil && j.joiner.OmitNil {
 		return j
 	}
 	if value == nil {
-		if j.NilToEmpty {
+		if j.joiner.NilToEmpty {
 			j.Add("")
 		} else {
 			j.Add(ValueOf(value))
@@ -131,11 +131,11 @@ func (j *JoinBuffer) AddStringer(value fmt.Stringer) *JoinBuffer {
 
 // AddAny add a new value of any type item to JoinBuffer
 func (j *JoinBuffer) AddAny(value interface{}) *JoinBuffer {
-	if value == nil && j.OmitNil {
+	if value == nil && j.joiner.OmitNil {
 		return j
 	}
 	if value == nil {
-		if j.NilToEmpty {
+		if j.joiner.NilToEmpty {
 			j.Add("")
 		} else {
 			j.Add(ValueOf(value))
@@ -173,18 +173,18 @@ func (j *JoinBuffer) AddAllAny(ss ...interface{}) *JoinBuffer {
 // String join all values as string
 func (j *JoinBuffer) String() string {
 	if !j.written {
-		j.builder.WriteString(j.Prefix)
+		j.builder.WriteString(j.joiner.Prefix)
 		j.written = true
 	}
-	j.builder.WriteString(j.Suffix)
+	j.builder.WriteString(j.joiner.Suffix)
 	return j.builder.String()
 }
 
 func (j *JoinBuffer) prepend() {
 	if !j.written {
-		j.builder.WriteString(j.Prefix)
+		j.builder.WriteString(j.joiner.Prefix)
 		j.written = true
 	} else {
-		j.builder.WriteString(j.Separator)
+		j.builder.WriteString(j.joiner.Separator)
 	}
 }
