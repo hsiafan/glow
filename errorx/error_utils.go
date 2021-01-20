@@ -23,7 +23,7 @@ type wrapError struct {
 
 func (e *wrapError) Error() string {
 	var sb strings.Builder
-	e.writeTo(sb)
+	e.writeTo(&sb)
 	return sb.String()
 }
 
@@ -31,14 +31,14 @@ func (e *wrapError) Unwrap() error {
 	return e.err
 }
 
-func (e *wrapError) writeTo(sb strings.Builder) {
+func (e *wrapError) writeTo(sb *strings.Builder) {
 	sb.WriteString(e.message)
 	sb.WriteString("\n    caused by: ")
 	we, ok := e.Unwrap().(*wrapError)
 	if ok {
 		we.writeTo(sb)
 	} else {
-		sb.WriteString(e.Error())
+		sb.WriteString(e.Unwrap().Error())
 	}
 }
 

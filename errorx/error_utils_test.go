@@ -15,6 +15,11 @@ func TestWrapError(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = we.(WrapError)
 	assert.True(t, ok)
+
+	we = Wrap("this is an message", err)
+	_, ok = we.(WrapError)
+	assert.True(t, ok)
+	assert.NotEmpty(t, we.Error())
 }
 
 func TestUnwrapUtil(t *testing.T) {
