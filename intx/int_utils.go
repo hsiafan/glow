@@ -114,3 +114,74 @@ func SafeParseInt8(str string, defaultValue int8) int8 {
 	}
 	return defaultValue
 }
+
+// Abs64 return absolute value for int64.
+// Note: Abs(MinInt64) return MinInt64 self
+func Abs64(value int64) int64 {
+	y := value >> 63
+	return (value ^ y) - y
+}
+
+// Abs32 return absolute value for int32.
+// Note: Abs(MinInt32) return MinInt32 self
+func Abs32(value int32) int32 {
+	y := value >> 31
+	return (value ^ y) - y
+}
+
+// Abs return absolute value for int.
+// Note: Abs(MinInt) return MinInt self
+func Abs(value int) int {
+	if value < 0 {
+		return -value
+	}
+	return value
+}
+
+// Min64 return smaller one of int64 values
+func Min64(value1, value2 int64) int64 {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// Max64 return bigger one of int64 values
+func Max64(value1, value2 int64) int64 {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}
+
+// Min32 return smaller one of int32 values
+func Min32(value1, value2 int32) int32 {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// Max32 return bigger one of int32 values
+func Max32(value1, value2 int32) int32 {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}
+
+// Min return smaller one of int values
+func Min(value1, value2 int) int {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// Max return bigger one of int values
+func Max(value1, value2 int) int {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}

@@ -98,3 +98,51 @@ func SafeParseUint(str string, defaultValue uint) uint {
 	}
 	return defaultValue
 }
+
+// MinU64 return smaller one of uint64 values
+func MinU64(value1, value2 uint64) uint64 {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// MaxU64 return bigger one of uint64 values
+func MaxU64(value1, value2 uint64) uint64 {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}
+
+// MinU32 return smaller one of uint32 values
+func MinU32(value1, value2 uint32) uint32 {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// MaxU32 return bigger one of uint32 values
+func MaxU32(value1, value2 uint32) uint32 {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}
+
+// MinU return smaller one of int values
+func MinU(value1, value2 uint) uint {
+	if value1 < value2 {
+		return value1
+	}
+	return value2
+}
+
+// MaxU return bigger one of uint values
+func MaxU(value1, value2 uint) uint {
+	if value1 > value2 {
+		return value1
+	}
+	return value2
+}

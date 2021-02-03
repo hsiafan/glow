@@ -159,3 +159,14 @@ func TestCopy(t *testing.T) {
 	sh := (*reflect.StringHeader)(unsafe.Pointer(&s3))
 	assert.Equal(t, 4, sh.Len)
 }
+
+func TestSlice(t *testing.T) {
+	assert.Equal(t, "test", Slice("test123", 0, -3))
+	assert.Equal(t, "123", SliceToEnd("test123", -3))
+}
+
+func TestFirstNonEmpty(t *testing.T) {
+	assert.Equal(t, "", FirstNonEmpty("", ""))
+	assert.Equal(t, "1", FirstNonEmpty("1", "2"))
+	assert.Equal(t, "2", FirstNonEmpty("", "2"))
+}

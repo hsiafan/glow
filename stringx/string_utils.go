@@ -8,7 +8,6 @@ import (
 	"github.com/hsiafan/glow/unsafex"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 const (
@@ -94,6 +93,14 @@ func PrependIfNotEmpty(str string, prefix string) string {
 		return str
 	}
 	return prefix + str
+}
+
+// FirstNonEmpty return first non-empty string; If all string is empty, return empty string.
+func FirstNonEmpty(s1, s2 string) string {
+	if len(s1) > 0 {
+		return s1
+	}
+	return s2
 }
 
 // SubstringAfter return sub string after the sep. If str does not contains sep, return empty str.
@@ -209,52 +216,53 @@ func DeCapitalize(str string) string {
 	return unsafex.BytesToString(bytes)
 }
 
-// SnakeToCamel convert underscore style str to Camel.
-// The param capitalized determine if first char is uppercase.
+// SnakeToCamel convert underscore style ascii str to Camel.
+// The param capitalized determine if first char is converted to uppercase.
 func SnakeToCamel(s string, capitalized bool) string {
 	var sb strings.Builder
 	var beginNewWord = false
 	var firstChar = true
-	for _, c := range s {
+
+	for i := 0; i < len(s); i++ {
+		c := s[i]
 		if c == '_' {
 			beginNewWord = true
 			continue
 		}
 		if firstChar {
 			if capitalized {
-				sb.WriteRune(unicode.ToUpper(c))
+				sb.WriteByte(ascii.ToUpper(c))
 			} else {
-				sb.WriteRune(c)
+				sb.WriteByte(c)
 			}
 			firstChar = false
 			beginNewWord = false
 			continue
 		}
 		if !beginNewWord {
-			sb.WriteRune(c)
+			sb.WriteByte(c)
 		} else {
 			beginNewWord = false
-			sb.WriteRune(unicode.ToUpper(c))
+			sb.WriteByte(ascii.ToUpper(c))
 		}
 	}
 	return sb.String()
 }
 
-// CamelToSnake convert camel style str to underscore snake style.
+// CamelToSnake convert camel style ascii str to underscore snake style.
 func CamelToSnake(s string) string {
-	runes := []rune(s)
 	var sb strings.Builder
-	for i := 0; i < len(runes); i++ {
-		c := runes[i]
-		if unicode.IsUpper(c) {
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if ascii.IsUpper(c) {
 			if i > 0 {
-				sb.WriteRune('_')
+				sb.WriteByte('_')
 			}
-			sb.WriteRune(unicode.ToLower(c))
+			sb.WriteByte(ascii.ToLower(c))
 			j := i + 1
-			for ; j < len(runes); j++ {
-				nc := runes[j]
-				if !unicode.IsUpper(nc) {
+			for ; j < len(s); j++ {
+				nc := s[j]
+				if !ascii.IsUpper(nc) {
 					j--
 					break
 				}
@@ -262,12 +270,12 @@ func CamelToSnake(s string) string {
 			j--
 			if j > i {
 				for k := i + 1; k <= j; k++ {
-					sb.WriteRune(unicode.ToLower(runes[k]))
+					sb.WriteByte(ascii.ToLower(s[k]))
 				}
 				i = j
 			}
 		} else {
-			sb.WriteRune(c)
+			sb.WriteByte(c)
 		}
 	}
 
@@ -277,8 +285,26 @@ func CamelToSnake(s string) string {
 // Copy copy a string content, for reducing large string content memory usage when do substring.
 // This method allocate a new string content byte array, thereby allow the larger string to be released by the garbage collector once it is no longer referenced
 func Copy(s string) string {
-	var sb strings.Builder
-	sb.Grow(len(s))
-	sb.WriteString(s)
-	return sb.String()
+	return string(unsafex.StringToBytes(s))
+}
+
+// Slice return substring from begin index(inclusive) to end index(exclusive).
+// The index for slice can be negative, which means count from end of the string(calculated by str_len + index).
+func Slice(str string, begin, end int) string {
+	if begin < 0 {
+		begin = len(str) + begin
+	}
+	if end < 0 {
+		end = len(str) + end
+	}
+	return str[begin:end]
+}
+
+// SliceToEnd return substring from begin index(inclusive) to end of string.
+// The index for slice can be negative, which means count from end of the string(calculated by str_len + index).
+func SliceToEnd(str string, begin int) string {
+	if begin < 0 {
+		begin = len(str) + begin
+	}
+	return str[begin:]
 }

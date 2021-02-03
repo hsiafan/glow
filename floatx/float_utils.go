@@ -1,6 +1,7 @@
 package floatx
 
 import (
+	"math"
 	"strconv"
 )
 
@@ -52,4 +53,14 @@ func SafeParse32(str string, defaultValue float32) float32 {
 		return value
 	}
 	return defaultValue
+}
+
+// Max32 return the larger one of float values
+func Max32(value1, value2 float32) float32 {
+	return float32(math.Max(float64(value1), float64(value2)))
+}
+
+// Min32 return the smaller one of float values
+func Min32(value1, value2 float32) float32 {
+	return float32(math.Min(float64(value1), float64(value2)))
 }
