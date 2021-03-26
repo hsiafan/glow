@@ -2,12 +2,13 @@ package stringx
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/hsiafan/glow/floatx"
 	"github.com/hsiafan/glow/intx"
 	"github.com/hsiafan/glow/stringx/ascii"
 	"github.com/hsiafan/glow/unsafex"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -103,40 +104,40 @@ func FirstNonEmpty(s1, s2 string) string {
 	return s2
 }
 
-// SubstringAfter return sub string after the sep. If str does not contains sep, return empty str.
-func SubstringAfter(str string, sep string) string {
+// SubstringAfter return sub string after the sep. If str does not contains sep, return empty OptionalString.
+func SubstringAfter(str string, sep string) OptionalString {
 	index := strings.Index(str, sep)
 	if index == -1 {
-		return ""
+		return OptionalString{}
 	}
-	return str[index+len(sep):]
+	return OptionalString{Value: str[index+len(sep):], Exists: true}
 }
 
-// SubstringAfterLast return sub string after the last sep. If str does not contains sep, return empty str.
-func SubstringAfterLast(str string, sep string) string {
+// SubstringAfterLast return sub string after the last sep. If str does not contains sep, return empty OptionalString.
+func SubstringAfterLast(str string, sep string) OptionalString {
 	index := strings.LastIndex(str, sep)
 	if index == -1 {
-		return ""
+		return OptionalString{}
 	}
-	return str[index+len(sep):]
+	return OptionalString{Value: str[index+len(sep):], Exists: true}
 }
 
-// SubstringBefore return sub string after the sep. If str does not contains sep, return the original str.
-func SubstringBefore(str string, sep string) string {
+// SubstringBefore return sub string after the sep. If str does not contains sep, return empty OptionalString.
+func SubstringBefore(str string, sep string) OptionalString {
 	index := strings.Index(str, sep)
 	if index == -1 {
-		return str
+		return OptionalString{}
 	}
-	return str[:index]
+	return OptionalString{Value: str[:index], Exists: true}
 }
 
-// SubstringBeforeLast return sub string after the last sep. If str does not contains sep, return the original str.
-func SubstringBeforeLast(str string, sep string) string {
+// SubstringBeforeLast return sub string after the last sep. If str does not contains sep, return empty OptionalString.
+func SubstringBeforeLast(str string, sep string) OptionalString {
 	index := strings.LastIndex(str, sep)
 	if index == -1 {
-		return str
+		return OptionalString{}
 	}
-	return str[:index]
+	return OptionalString{Value: str[:index], Exists: true}
 }
 
 // PadLeft pad str to width, with padding rune at left.

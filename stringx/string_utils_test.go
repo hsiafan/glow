@@ -6,8 +6,9 @@ import (
 	"strings"
 	"testing"
 	"unsafe"
+
+	"github.com/stretchr/testify/assert"
 )
-import "github.com/stretchr/testify/assert"
 
 type testFace interface {
 }
@@ -58,35 +59,35 @@ func TestPrependIfMissing(t *testing.T) {
 }
 
 func TestSubStringAfter(t *testing.T) {
-	assert.Equal(t, "est", SubstringAfter("123test", "t"))
-	assert.Equal(t, "", SubstringAfter("test", "st"))
-	assert.Equal(t, "test", SubstringAfter("test", ""))
-	assert.Equal(t, "", SubstringAfter("test", "xxst"))
-	assert.Equal(t, "", SubstringAfter("", "t"))
+	assert.Equal(t, "est", SubstringAfter("123test", "t").Value)
+	assert.Equal(t, "", SubstringAfter("test", "st").Value)
+	assert.Equal(t, "test", SubstringAfter("test", "").Value)
+	assert.Equal(t, "", SubstringAfter("test", "xxst").Value)
+	assert.Equal(t, "", SubstringAfter("", "t").Value)
 }
 
 func TestSubStringAfterLast(t *testing.T) {
-	assert.Equal(t, "", SubstringAfterLast("123test", "t"))
-	assert.Equal(t, "", SubstringAfterLast("test", ""))
-	assert.Equal(t, "", SubstringAfterLast("test", "xxst"))
-	assert.Equal(t, "x", SubstringAfterLast("testx", "t"))
-	assert.Equal(t, "", SubstringAfterLast("", "t"))
+	assert.Equal(t, "", SubstringAfterLast("123test", "t").Value)
+	assert.Equal(t, "", SubstringAfterLast("test", "").Value)
+	assert.Equal(t, "", SubstringAfterLast("test", "xxst").Value)
+	assert.Equal(t, "x", SubstringAfterLast("testx", "t").Value)
+	assert.Equal(t, "", SubstringAfterLast("", "t").Value)
 }
 
 func TestSubstringBefore(t *testing.T) {
-	assert.Equal(t, "123", SubstringBefore("123test", "t"))
-	assert.Equal(t, "", SubstringBefore("test", "te"))
-	assert.Equal(t, "", SubstringBefore("test", ""))
-	assert.Equal(t, "test", SubstringBefore("test", "xxst"))
-	assert.Equal(t, "", SubstringBefore("", "t"))
+	assert.Equal(t, "123", SubstringBefore("123test", "t").Value)
+	assert.Equal(t, "", SubstringBefore("test", "te").Value)
+	assert.Equal(t, "", SubstringBefore("test", "").Value)
+	assert.Equal(t, false, SubstringBefore("test", "xxst").Exists)
+	assert.Equal(t, "", SubstringBefore("", "t").Value)
 }
 
 func TestSubstringBeforeLast(t *testing.T) {
-	assert.Equal(t, "123tes", SubstringBeforeLast("123test", "t"))
-	assert.Equal(t, "", SubstringBeforeLast("test", "te"))
-	assert.Equal(t, "test", SubstringBeforeLast("test", ""))
-	assert.Equal(t, "test", SubstringBeforeLast("test", "xxst"))
-	assert.Equal(t, "", SubstringBeforeLast("", "t"))
+	assert.Equal(t, "123tes", SubstringBeforeLast("123test", "t").Value)
+	assert.Equal(t, "", SubstringBeforeLast("test", "te").Value)
+	assert.Equal(t, "test", SubstringBeforeLast("test", "").Value)
+	assert.Equal(t, false, SubstringBeforeLast("test", "xxst").Exists)
+	assert.Equal(t, "", SubstringBeforeLast("", "t").Value)
 }
 
 func TestPadLeft(t *testing.T) {
