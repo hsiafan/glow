@@ -196,7 +196,7 @@ func Capitalize(str string) string {
 	if str == "" {
 		return str
 	}
-	if ascii.IsUpper(str[0]) {
+	if !ascii.IsLower(str[0]) {
 		return str
 	}
 	bytes := []byte(str)
@@ -209,7 +209,7 @@ func DeCapitalize(str string) string {
 	if str == "" {
 		return str
 	}
-	if ascii.IsLower(str[0]) {
+	if !ascii.IsUpper(str[0]) {
 		return str
 	}
 	bytes := []byte(str)
