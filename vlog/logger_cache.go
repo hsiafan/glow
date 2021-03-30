@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"unsafe"
 )
 
 var loggerCache = initLogCache()
@@ -80,12 +79,12 @@ func (lc *LoggerCache) Load(name string) *Logger {
 		frozen = true
 	}
 
-	appenders := &[]Appender{defaultAppender}
 	logger = &Logger{
-		name:      name,
-		level:     int32(level),
-		appenders: unsafe.Pointer(appenders),
-		frozen:    frozen,
+		name:        name,
+		level:       int32(level),
+		appenders:   []Appender{DefaultAppender()},
+		transformer: DefaultTransformer(),
+		frozen:      frozen,
 	}
 	lc.loggerMap[name] = logger
 	return logger

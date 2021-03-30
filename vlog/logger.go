@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
-	"unsafe"
 )
 
 // Level the logger level
@@ -40,10 +40,12 @@ const (
 
 // Logger the logger
 type Logger struct {
-	name      string
-	level     int32          //Level
-	appenders unsafe.Pointer //*[]Appender
-	frozen    bool           // frozen level. the level is set by env, following level set in code will not take effect
+	name        string
+	level       int32        // Level
+	appenders   []Appender   // Appenders
+	transformer Transformer  // Transformer
+	frozen      bool         // frozen level. the level is set by env, following level set in code will not take effect
+	lock        sync.RWMutex // mutex for change logger setting
 }
 
 // Name the name of this logger
@@ -66,12 +68,16 @@ func (l *Logger) Level() Level {
 
 // SetAppenders set one or multi appenders for this logger
 func (l *Logger) SetAppenders(appenders ...Appender) {
-	atomic.StorePointer(&l.appenders, unsafe.Pointer(&appenders))
+	l.lock.Lock()
+	defer l.lock.Unlock()
+	l.appenders = appenders
 }
 
 // Appenders return the appenders this logger have
 func (l *Logger) Appenders() []Appender {
-	return *(*[]Appender)(atomic.LoadPointer(&l.appenders))
+	l.lock.RLock()
+	defer l.lock.RUnlock()
+	return l.appenders
 }
 
 // AddAppenders add one new appender to logger
@@ -79,24 +85,26 @@ func (l *Logger) AddAppenders(appenders ...Appender) {
 	if len(appenders) == 0 {
 		return
 	}
-
-	for {
-		p := atomic.LoadPointer(&l.appenders)
-		originAppenders := *(*[]Appender)(p)
-		newAppenders := make([]Appender, len(originAppenders)+len(appenders))
-		copy(newAppenders, originAppenders)
-		copy(newAppenders[len(originAppenders):], appenders)
-		if atomic.CompareAndSwapPointer(&l.appenders, p, unsafe.Pointer(&newAppenders)) {
-			break
-		}
-	}
+	l.lock.Lock()
+	defer l.lock.Unlock()
+	newAppenders := make([]Appender, len(l.appenders)+len(appenders))
+	copy(newAppenders, l.appenders)
+	copy(newAppenders[len(l.appenders):], appenders)
+	l.appenders = newAppenders
 }
 
-// SetTransformerForAppenders set transformer, apply to all appenders the logger current have
-func (l *Logger) SetTransformerForAppenders(transformer Transformer) {
-	for _, appender := range l.Appenders() {
-		appender.SetTransformer(transformer)
-	}
+// Transformer get the transformer of this logger
+func (l *Logger) Transformer() Transformer {
+	l.lock.RLock()
+	defer l.lock.RUnlock()
+	return l.transformer
+}
+
+// SetTransformer set transformer to this logger
+func (l *Logger) SetTransformer(transformer Transformer) {
+	l.lock.Lock()
+	defer l.lock.Unlock()
+	l.transformer = transformer
 }
 
 // Trace log message with trace level
@@ -216,10 +224,9 @@ func (l *Logger) logFormat(level Level, format string, args ...interface{}) {
 
 func (l *Logger) writeToAppends(level Level, appenders []Appender, message string) error {
 	now := time.Now()
-	//TODO: async, parallel write
+	transformer := l.Transformer()
+	appendEvent := transformer.Transform(LogRecord{l.Name(), level, now, message})
 	for _, appender := range appenders {
-		transformer := appender.Transformer()
-		appendEvent := transformer.Transform(LogRecord{l.Name(), level, now, message})
 		err := appender.Append(appendEvent)
 		if err != nil {
 			//TODO: collection errors
@@ -263,12 +270,40 @@ func argToString(arg interface{}) string {
 }
 
 // GetLogger return the logger with name
-func GetLogger(name string) *Logger {
-	return loggerCache.Load(name)
+func GetLogger(name string, options ...LoggerOption) *Logger {
+	logger := loggerCache.Load(name)
+	for _, o := range options {
+		o(logger)
+	}
+	return logger
 }
 
 // CurrentPackageLogger return the log of current package, use package name as logger name
-func CurrentPackageLogger() *Logger {
+func CurrentPackageLogger(options ...LoggerOption) *Logger {
 	caller := getCaller(2)
-	return GetLogger(caller.packageName)
+	return GetLogger(caller.packageName, options...)
+}
+
+// LoggerOption is a alias for custom logger
+type LoggerOption func(l *Logger)
+
+// WithLevel for convenient setting level when create logger. Default level is Info
+func WithLevel(level Level) LoggerOption {
+	return func(l *Logger) {
+		l.SetLevel(level)
+	}
+}
+
+// WithAppenders for convenient setting Appenders when creating logger. Default is ConsoleAppender
+func WithAppenders(appenders ...Appender) LoggerOption {
+	return func(l *Logger) {
+		l.SetAppenders(appenders...)
+	}
+}
+
+// WithTransformer for convenient setting Transformer when creating logger. Default is defaultTransformer
+func WithTransformer(transformer Transformer) LoggerOption {
+	return func(l *Logger) {
+		l.SetTransformer(transformer)
+	}
 }

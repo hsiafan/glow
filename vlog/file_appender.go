@@ -15,7 +15,6 @@ import (
 
 // FileAppender appender that write log to local file
 type FileAppender struct {
-	*CanFormattedMixin
 	path    string
 	file    unsafe.Pointer //*os.File, current opened file
 	rotater Rotater
@@ -45,10 +44,9 @@ func NewFileAppender(path string, rotater Rotater) (*FileAppender, error) {
 		rotater.setInitStatus(fileInfo.ModTime(), fileInfo.Size(), suffixes)
 	}
 	return &FileAppender{
-		path:              path,
-		file:              unsafe.Pointer(file),
-		rotater:           rotater,
-		CanFormattedMixin: NewAppenderMixin(),
+		path:    path,
+		file:    unsafe.Pointer(file),
+		rotater: rotater,
 	}, nil
 }
 
