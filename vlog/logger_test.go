@@ -15,19 +15,19 @@ func TestLogger(t *testing.T) {
 
 	appender := NewBytesAppender()
 	logger.SetAppenders(appender)
-	logger.Info("this is a test")
+	logger.AtInfo().Log("this is a test")
 	assert.True(t, strings.HasSuffix(appender.buffer.String(),
 		" [Info] github.com/hsiafan/glow/vlog - this is a test\n"))
 
 	appender = NewBytesAppender()
 	logger.SetAppenders(appender)
-	logger.InfoFormat("this is a test")
+	logger.AtInfo().LogFormat("this is a test")
 	assert.True(t, strings.HasSuffix(appender.buffer.String(),
 		" [Info] github.com/hsiafan/glow/vlog - this is a test\n"))
 
 	appender = NewBytesAppender()
 	logger.SetAppenders(appender)
-	logger.InfoLazy(func() string { return "this is a test" })
+	logger.AtInfo().LogLazy(func() string { return "this is a test" })
 	assert.True(t, strings.HasSuffix(appender.buffer.String(),
 		" [Info] github.com/hsiafan/glow/vlog - this is a test\n"))
 
@@ -35,7 +35,7 @@ func TestLogger(t *testing.T) {
 	transformer, _ := NewPatternTransformer("{time|2006-01-02} {package}/{file} - {message}\n")
 	appender.SetTransformer(transformer)
 	logger.SetAppenders(appender)
-	logger.Info("this is a test")
+	logger.AtInfo().Log("this is a test")
 	date := time.Now().Format("2006-01-02")
 	assert.Equal(t, date+" github.com/hsiafan/glow/vlog/logger_test.go - this is a test\n", appender.buffer.String())
 

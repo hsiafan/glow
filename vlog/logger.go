@@ -100,63 +100,56 @@ func (l *Logger) SetTransformerForAppenders(transformer Transformer) {
 }
 
 // Trace log message with trace level
-func (l *Logger) Trace(firstArg interface{}, args ...interface{}) {
-	l.log(Trace, firstArg, args...)
+func (l *Logger) AtTrace() LoggerContext {
+	return LoggerContext{logger: l, level: Trace}
 }
 
 // Debug log message with debug level
-func (l *Logger) Debug(firstArg interface{}, args ...interface{}) {
-	l.log(Debug, firstArg, args...)
+func (l *Logger) AtDebug() LoggerContext {
+	return LoggerContext{logger: l, level: Debug}
 }
 
 // Info log message with info level
-func (l *Logger) Info(firstArg interface{}, args ...interface{}) {
-	l.log(Info, firstArg, args...)
+func (l *Logger) AtInfo() LoggerContext {
+	return LoggerContext{logger: l, level: Info}
 }
 
 // Warn log message with warn level
-func (l *Logger) Warn(firstArg interface{}, args ...interface{}) {
-	l.log(Warn, firstArg, args...)
+func (l *Logger) AtWarn() LoggerContext {
+	return LoggerContext{logger: l, level: Warn}
 }
 
 // log message with error level
-func (l *Logger) Error(firstArg interface{}, args ...interface{}) {
-	l.log(Error, firstArg, args...)
+func (l *Logger) AtError() LoggerContext {
+	return LoggerContext{logger: l, level: Error}
 }
 
 // Critical log message with critical level
-func (l *Logger) Critical(firstArg interface{}, args ...interface{}) {
-	l.log(Critical, firstArg, args...)
+func (l *Logger) AtCritical() LoggerContext {
+	return LoggerContext{logger: l, level: Critical}
 }
 
-// TraceFormat log message with trace level
-func (l *Logger) TraceFormat(format string, args ...interface{}) {
-	l.logFormat(Trace, format, args...)
+// LoggerContext for logger call
+type LoggerContext struct {
+	logger *Logger
+	level  Level
 }
 
-// DebugFormat log message with debug level
-func (l *Logger) DebugFormat(format string, args ...interface{}) {
-	l.logFormat(Debug, format, args...)
+// Log log message
+func (l LoggerContext) Log(firstArg interface{}, args ...interface{}) {
+	l.logger.log(l.level, firstArg, args...)
 }
 
-// InfoFormat log message with info level
-func (l *Logger) InfoFormat(format string, args ...interface{}) {
-	l.logFormat(Info, format, args...)
+// Log log message with format and args
+func (l LoggerContext) LogFormat(format string, args ...interface{}) {
+	l.logger.logFormat(l.level, format, args...)
 }
 
-// WarnFormat log message with warn level
-func (l *Logger) WarnFormat(format string, args ...interface{}) {
-	l.logFormat(Warn, format, args...)
-}
-
-// ErrorFormat message with error level
-func (l *Logger) ErrorFormat(format string, args ...interface{}) {
-	l.logFormat(Error, format, args...)
-}
-
-// CriticalFormat log message with critical level
-func (l *Logger) CriticalFormat(format string, args ...interface{}) {
-	l.logFormat(Critical, format, args...)
+// LogLazy log message, it call func to get log message only when log is performed.
+func (l LoggerContext) LogLazy(f func() string) {
+	if l.logger.Level() <= l.level {
+		l.logger.logString(l.level, f())
+	}
 }
 
 // TraceEnabled if this logger log trace message
@@ -187,54 +180,6 @@ func (l *Logger) ErrorEnabled() bool {
 // CriticalEnabled if this logger log critical message
 func (l *Logger) CriticalEnabled() bool {
 	return l.Level() <= Critical
-}
-
-// TraceLazy log message with trace level, and call func to get log message only when log is performed.
-func (l *Logger) TraceLazy(f func() string) {
-	if !l.TraceEnabled() {
-		return
-	}
-	l.logString(Trace, f())
-}
-
-// DebugLazy log message with debug level, and call func to get log message only when log is performed.
-func (l *Logger) DebugLazy(f func() string) {
-	if !l.DebugEnabled() {
-		return
-	}
-	l.logString(Debug, f())
-}
-
-// InfoLazy log message with info level, and call func to get log message only when log is performed.
-func (l *Logger) InfoLazy(f func() string) {
-	if !l.InfoEnabled() {
-		return
-	}
-	l.logString(Info, f())
-}
-
-// WarnLazy log message with warn level, and call func to get log message only when log is performed.
-func (l *Logger) WarnLazy(f func() string) {
-	if !l.WarnEnabled() {
-		return
-	}
-	l.logString(Warn, f())
-}
-
-// ErrorLazy log message with error level, and call func to get log message only when log is performed.
-func (l *Logger) ErrorLazy(f func() string) {
-	if !l.ErrorEnabled() {
-		return
-	}
-	l.logString(Error, f())
-}
-
-// CriticalLazy log message with critical level, and call func to get log message only when log is performed.
-func (l *Logger) CriticalLazy(f func() string) {
-	if !l.CriticalEnabled() {
-		return
-	}
-	l.logString(Critical, f())
 }
 
 // log multi messages, delimited with a white space
