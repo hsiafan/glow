@@ -79,7 +79,7 @@ func Hash32Reader(r io.Reader, h hash.Hash32) (uint32, error) {
 	return h.Sum32(), nil
 }
 
-// Hash32Reader calculate 32 bit hash as uint result for byte array data.
+// Hash32File calculate 32 bit hash as uint result for byte array data.
 // The file is closed when hash calculating finish or an err occurred.
 // If error occurred when read data, return 0 as result and a an error.
 //
@@ -109,7 +109,7 @@ func Hash64Reader(r io.Reader, h hash.Hash64) (uint64, error) {
 	return h.Sum64(), nil
 }
 
-// Hash64Reader calculate 64 bit hash as uint result for byte array data.
+// Hash64File calculate 64 bit hash as uint result for byte array data.
 // The file is closed when hash calculating finish or an err occurred.
 // If error occurred when read data, return 0 as result and a an error.
 func Hash64File(path string, h hash.Hash64) (uint64, error) {

@@ -32,7 +32,7 @@ func Hours(hours int) time.Duration {
 	return time.Hour * time.Duration(hours)
 }
 
-// HoursDuration create time.Duration from hours
+// Days create time.Duration from hours
 func Days(days int) time.Duration {
 	return time.Hour * 24 * time.Duration(days)
 }

@@ -54,12 +54,12 @@ func (r *ReaderBody) GetReader() (io.Reader, error) {
 	return r.reader, nil
 }
 
-// Create new Body from reader
+// NewBody create new Body from reader
 func NewBody(reader io.Reader, contentType string) *ReaderBody {
 	return NewBodyWithEncoding(reader, contentType, nil)
 }
 
-// Create new Body from reader
+// NewBodyWithEncoding create new Body from reader
 func NewBodyWithEncoding(reader io.Reader, contentType string, enc encoding.Encoding) *ReaderBody {
 	return &ReaderBody{
 		hasMimeType: hasMimeType{contentType},

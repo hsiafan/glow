@@ -16,6 +16,7 @@ const (
 	MimeTypeMultipart = "multipart/form-data"
 
 	// images.
+
 	MimeTypeAPNG = "image/apng"
 	MimeTypeBMP  = "image/bmp"
 	MimeTypeGIF  = "image/gif"
