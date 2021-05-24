@@ -381,25 +381,25 @@ func setValue(str string, kind reflect.Kind, value reflect.Value) error {
 	case reflect.String:
 		value.SetString(str)
 	case reflect.Int:
-		v, err := intx.ParseInt(str)
+		v, err := intx.Parse(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int8:
-		v, err := intx.ParseInt8(str)
+		v, err := intx.Parse8(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int16:
-		v, err := intx.ParseInt16(str)
+		v, err := intx.Parse16(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int32:
-		v, err := intx.ParseInt32(str)
+		v, err := intx.Parse32(str)
 		if err != nil {
 			return err
 		}
@@ -414,37 +414,37 @@ func setValue(str string, kind reflect.Kind, value reflect.Value) error {
 			value.Set(reflect.ValueOf(v))
 			return nil
 		}
-		v, err := intx.ParseInt64(str)
+		v, err := intx.Parse64(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(v)
 	case reflect.Uint:
-		v, err := intx.ParseUint(str)
+		v, err := intx.ParseUnsigned(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint8:
-		v, err := intx.ParseUint8(str)
+		v, err := intx.ParseUnsigned8(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint16:
-		v, err := intx.ParseUint16(str)
+		v, err := intx.ParseUnsigned16(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint32:
-		v, err := intx.ParseUint32(str)
+		v, err := intx.ParseUnsigned32(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint64:
-		v, err := intx.ParseUint64(str)
+		v, err := intx.ParseUnsigned64(str)
 		if err != nil {
 			return err
 		}

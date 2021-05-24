@@ -26,25 +26,25 @@ func ValueOf(v interface{}) string {
 	case bool:
 		return strconv.FormatBool(v.(bool))
 	case int:
-		return intx.FormatInt(v.(int))
+		return intx.Format(v.(int))
 	case int8:
-		return intx.FormatInt8(v.(int8))
+		return intx.Format8(v.(int8))
 	case int16:
-		return intx.FormatInt16(v.(int16))
+		return intx.Format16(v.(int16))
 	case int32:
-		return intx.FormatInt32(v.(int32))
+		return intx.Format32(v.(int32))
 	case int64:
-		return intx.FormatInt64(v.(int64))
+		return intx.Format64(v.(int64))
 	case uint:
-		return intx.FormatUint(v.(uint))
+		return intx.FormatUnsigned(v.(uint))
 	case uint8:
-		return intx.FormatUint8(v.(uint8))
+		return intx.FormatUnsigned8(v.(uint8))
 	case uint16:
-		return intx.FormatUint16(v.(uint16))
+		return intx.FormatUnsigned16(v.(uint16))
 	case uint32:
-		return intx.FormatUint32(v.(uint32))
+		return intx.FormatUnsigned32(v.(uint32))
 	case uint64:
-		return intx.FormatUint64(v.(uint64))
+		return intx.FormatUnsigned64(v.(uint64))
 	case float32:
 		return floatx.SimpleFormat32(v.(float32))
 	case float64:

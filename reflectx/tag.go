@@ -37,7 +37,7 @@ func GetInt64TagValue(tag reflect.StructTag, name string, defaultValue int64) (i
 // If tag present and parse error, return error.
 func GetUIntTagValue(tag reflect.StructTag, name string, defaultValue uint) (uint, error) {
 	if value, ok := tag.Lookup(name); ok {
-		return intx.ParseUint(value)
+		return intx.ParseUnsigned(value)
 	}
 	return defaultValue, nil
 }

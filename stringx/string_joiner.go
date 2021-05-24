@@ -87,28 +87,28 @@ func (j *JoinBuffer) Add(str string) *JoinBuffer {
 // AddInt add a new int item to JoinBuffer
 func (j *JoinBuffer) AddInt(value int) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatInt(value))
+	j.builder.WriteString(intx.Format(value))
 	return j
 }
 
 // AddUint add a new uint item to JoinBuffer
 func (j *JoinBuffer) AddUint(value uint) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatUint(value))
+	j.builder.WriteString(intx.FormatUnsigned(value))
 	return j
 }
 
 // AddInt64 add a new int64 item to JoinBuffer
 func (j *JoinBuffer) AddInt64(value int64) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatInt64(value))
+	j.builder.WriteString(intx.Format64(value))
 	return j
 }
 
 // AddUint64 add a new uint64 item to JoinBuffer
 func (j *JoinBuffer) AddUint64(value uint64) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatUint64(value))
+	j.builder.WriteString(intx.FormatUnsigned64(value))
 	return j
 }
 
