@@ -23,9 +23,7 @@ func TryLock(m *sync.Mutex) bool {
 	return false
 }
 
-// WithLock run code within protection of lock.
-func WithLock(m *sync.Mutex, f func()) {
-	m.Lock()
-	defer m.Unlock()
-	f()
+// IsLocked return weather lock is locked
+func IsLocked(m *sync.Mutex) bool {
+	return atomic.LoadInt32((*int32)(unsafe.Pointer(m))) == mutexLocked
 }

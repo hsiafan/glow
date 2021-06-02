@@ -96,7 +96,7 @@ func (r *LineReader) ForEachLine(consume func(line string)) error {
 	}
 }
 
-// ReadAllLine read all lines in reader, return lines, and an error if any error occurred while read.
+// ReadAllLines read all lines in reader, return lines, and an error if any error occurred while read.
 // If read all data succeed till and io.EOF, nil error will be returned.
 func (r *LineReader) ReadAllLines() ([]string, error) {
 	var lines []string

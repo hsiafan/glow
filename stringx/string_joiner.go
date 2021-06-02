@@ -38,7 +38,7 @@ func (j *Joiner) JoinStringer(stringers []fmt.Stringer) string {
 	return joiner.String()
 }
 
-// JoinStringer join fmt.Stringer items to one string
+// JoinAny join fmt.Stringer items to one string
 func (j *Joiner) JoinAny(values []interface{}) string {
 	joiner := j.NewBuffer()
 	joiner.AddAllAny(values...)
