@@ -27,7 +27,7 @@ func ReadAll(r io.Reader) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 
-// ForEachLine read all lines in reader with specific encoding, and call consume function,
+// ForEachLineWithEncoding read all lines in reader with specific encoding, and call consume function,
 // The line index pass to function start from 0.
 // If and err occurred during read, return an error. If read all data succeed till and io.EOF, nil error will be
 // returned.

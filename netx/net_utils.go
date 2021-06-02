@@ -35,13 +35,13 @@ func SplitHostPort(str string) (string, uint16, error) {
 type HostType int8
 
 const (
-	// Not a host
+	//ILLEGAL Not a host
 	ILLEGAL HostType = -1
-	// domain host
+	//DOMAIN domain host
 	DOMAIN HostType = 0
-	// ipv4 address host
+	//IPv4 ipv4 address host
 	IPv4 HostType = 1
-	// ipv6 address host
+	//IPv6 ipv6 address host
 	IPv6 HostType = 2
 )
 

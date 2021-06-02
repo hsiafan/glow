@@ -46,7 +46,7 @@ func (j *KVJoiner) AddAny(key interface{}, value interface{}) {
 	j.builder.WriteString(ValueOf(value))
 }
 
-// AddAny add all key-value items in a map to
+// AddAll add all key-value items in a map to
 func (j *KVJoiner) AddAll(m map[string]string) {
 	for k, v := range m {
 		j.Add(k, v)
