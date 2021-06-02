@@ -3,7 +3,7 @@ package httpx
 import (
 	"crypto/tls"
 	"errors"
-	"github.com/hsiafan/glow/timex"
+	"github.com/hsiafan/glow/timex/durationx"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -26,8 +26,8 @@ type Client struct {
 // NewClient create new http client
 func NewClient(options ...ClientOption) *Client {
 	dialer := &net.Dialer{
-		Timeout:   timex.SecondsDuration(10),
-		KeepAlive: timex.SecondsDuration(15), // tcp keep alive
+		Timeout:   durationx.Seconds(10),
+		KeepAlive: durationx.Seconds(15), // tcp keep alive
 	}
 	tlsConfig := &tls.Config{}
 	transport := &http.Transport{
@@ -42,7 +42,7 @@ func NewClient(options ...ClientOption) *Client {
 		tlsConfig: tlsConfig,
 		client: &http.Client{
 			Transport: transport,
-			Timeout:   timex.MinutesDuration(2),
+			Timeout:   durationx.Minutes(2),
 		},
 	}
 	for _, option := range options {

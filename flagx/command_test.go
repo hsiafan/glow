@@ -1,7 +1,7 @@
 package flagx
 
 import (
-	"github.com/hsiafan/glow/timex"
+	"github.com/hsiafan/glow/timex/durationx"
 	"testing"
 	"time"
 
@@ -31,8 +31,8 @@ func TestNewCommandLine(t *testing.T) {
 	assert.Equal(t, []string{"4s"}, op.Args)
 	assert.Equal(t, "file1", op.File)
 	assert.Equal(t, 1, op.Age)
-	assert.Equal(t, timex.MinutesDuration(1), op.Timeout)
-	assert.Equal(t, timex.SecondsDuration(3), op.Timeout2)
+	assert.Equal(t, durationx.Minutes(1), op.Timeout)
+	assert.Equal(t, durationx.Seconds(3), op.Timeout2)
 
 	//cmd.ShowUsage()
 }
