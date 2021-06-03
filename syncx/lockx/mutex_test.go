@@ -1,4 +1,4 @@
-package syncx
+package lockx
 
 import (
 	"github.com/stretchr/testify/assert"

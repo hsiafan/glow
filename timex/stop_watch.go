@@ -28,7 +28,7 @@ func NewStopwatchStarted() *Stopwatch {
 	}
 }
 
-// Start the Stopwatch. If StopWatch is already started, return false.
+// Start start the Stopwatch. If StopWatch is already started, return false.
 // A stopped Stopwatch can start again.
 func (w *Stopwatch) Start() bool {
 	switch w.status {
@@ -45,7 +45,7 @@ func (w *Stopwatch) Start() bool {
 	panic("")
 }
 
-// Stop the Stopwatch. The elapsed time will not changed after stopped.
+// Stop stop the Stopwatch. The elapsed time will not changed after stopped.
 // Return true if stop succeed. If Stopwatch is not started, or already stopped, return false.
 func (w *Stopwatch) Stop() bool {
 	switch w.status {
@@ -78,7 +78,7 @@ func (w *Stopwatch) Elapsed() time.Duration {
 	panic("")
 }
 
-// Elapsed return elapsed time by milli-seconds.
+// ElapsedMillis return elapsed time by milli-seconds.
 // If not started, always return zero;
 // If started and not stopped, return time interval from begin time to now;
 // If stopped, return elapsed time duration from started time to stopped time.
