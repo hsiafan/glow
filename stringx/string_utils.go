@@ -5,7 +5,6 @@ import (
 	"github.com/hsiafan/glow/floatx"
 	"github.com/hsiafan/glow/intx"
 	"github.com/hsiafan/glow/stringx/ascii"
-	"github.com/hsiafan/glow/unsafex"
 	"strconv"
 	"strings"
 )
@@ -200,7 +199,7 @@ func Capitalize(str string) string {
 	}
 	bytes := []byte(str)
 	bytes[0] = ascii.ToUpper(str[0])
-	return unsafex.BytesToString(bytes)
+	return FromBytes(bytes)
 }
 
 // DeCapitalize return str with first char of ascii str lower case.
@@ -213,7 +212,7 @@ func DeCapitalize(str string) string {
 	}
 	bytes := []byte(str)
 	bytes[0] = ascii.ToLower(str[0])
-	return unsafex.BytesToString(bytes)
+	return FromBytes(bytes)
 }
 
 // SnakeToCamel convert underscore style ascii str to Camel.
@@ -285,7 +284,7 @@ func CamelToSnake(s string) string {
 // Copy copy a string content, for reducing large string content memory usage when do substring.
 // This method allocate a new string content byte array, thereby allow the larger string to be released by the garbage collector once it is no longer referenced
 func Copy(s string) string {
-	return string(unsafex.StringToBytes(s))
+	return string(ToBytes(s))
 }
 
 // Slice return substring from begin index(inclusive) to end index(exclusive).

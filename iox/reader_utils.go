@@ -1,7 +1,7 @@
 package iox
 
 import (
-	"github.com/hsiafan/glow/unsafex"
+	"github.com/hsiafan/glow/stringx"
 	"golang.org/x/text/encoding"
 	"io"
 	"io/ioutil"
@@ -19,7 +19,7 @@ func ReadAllString(r io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return unsafex.BytesToString(data), err
+	return stringx.FromBytes(data), err
 }
 
 // ReadAll read and return all data in reader

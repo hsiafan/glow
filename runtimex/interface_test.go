@@ -1,4 +1,4 @@
-package unsafex
+package runtimex
 
 import (
 	"github.com/stretchr/testify/assert"

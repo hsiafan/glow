@@ -1,4 +1,4 @@
-package unsafex
+package stringx
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,9 +6,9 @@ import (
 )
 
 func TestBytesToString(t *testing.T) {
-	assert.Equal(t, "test", BytesToString([]byte("test")))
+	assert.Equal(t, "test", FromBytes([]byte("test")))
 }
 
 func TestStringToBytes(t *testing.T) {
-	assert.Equal(t, []byte("test"), StringToBytes("test"))
+	assert.Equal(t, []byte("test"), ToBytes("test"))
 }

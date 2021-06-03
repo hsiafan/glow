@@ -1,7 +1,6 @@
-package chanx
+package runtimex
 
 import (
-	"github.com/hsiafan/glow/unsafex"
 	"sync/atomic"
 	"unsafe"
 )
@@ -17,8 +16,8 @@ type myChan struct {
 // Chan the channel type, to be generified
 type Chan = interface{}
 
-// IsClosed return if channel is closed, no read from channel required.
-func IsClosed(c Chan) bool {
-	hc := (*myChan)(unsafex.InterfaceValuePtr(c))
+// ChanIsClosed return if channel is closed, no read from channel required.
+func ChanIsClosed(c Chan) bool {
+	hc := (*myChan)(InterfaceValuePtr(c))
 	return atomic.LoadUint32(&hc.closed) != 0
 }

@@ -1,7 +1,6 @@
 package stringx
 
 import (
-	"github.com/hsiafan/glow/unsafex"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 )
@@ -11,7 +10,7 @@ func Encode(str string, enc encoding.Encoding) ([]byte, error) {
 	if enc == unicode.UTF8 {
 		return []byte(str), nil
 	}
-	return enc.NewEncoder().Bytes(unsafex.StringToBytes(str))
+	return enc.NewEncoder().Bytes(ToBytes(str))
 }
 
 // Decode decode bytes to str using specific encoding
@@ -23,5 +22,5 @@ func Decode(data []byte, enc encoding.Encoding) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return unsafex.BytesToString(bytes), err
+	return FromBytes(bytes), err
 }
