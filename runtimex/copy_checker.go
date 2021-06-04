@@ -1,4 +1,4 @@
-package glow
+package runtimex
 
 import (
 	"sync/atomic"

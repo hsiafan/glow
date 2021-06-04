@@ -170,3 +170,18 @@ func TestFirstNonEmpty(t *testing.T) {
 	assert.Equal(t, "1", FirstNonEmpty("1", "2"))
 	assert.Equal(t, "2", FirstNonEmpty("", "2"))
 }
+
+func TestContains(t *testing.T) {
+	assert.True(t, Contains("", ""))
+	assert.True(t, Contains("aaab", ""))
+	assert.True(t, Contains("aaab", "a"))
+	assert.False(t, Contains("", "a"))
+	assert.False(t, Contains("b", "a"))
+}
+
+func TestContainsAny(t *testing.T) {
+	assert.True(t, ContainsAny("", []string{""}))
+	assert.True(t, ContainsAny("", []string{"", "as"}))
+	assert.True(t, ContainsAny("as", []string{"test", "as"}))
+	assert.False(t, ContainsAny("as", []string{"12", "34"}))
+}

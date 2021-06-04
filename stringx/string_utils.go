@@ -154,7 +154,7 @@ func PadLeft(str string, width int, r rune) string {
 	return builder.String()
 }
 
-// PadLeft pad str to width, with padding rune at right.
+// PadRight pad str to width, with padding rune at right.
 // If str len already equals with or larger than width, return original str.
 func PadRight(str string, width int, r rune) string {
 	if len(str) >= width {
@@ -306,4 +306,19 @@ func SliceToEnd(str string, begin int) string {
 		begin = len(str) + begin
 	}
 	return str[begin:]
+}
+
+// Contains return whether str contains any one of subStrings.
+func Contains(str string, sub string) bool {
+	return strings.Index(str, sub) >= 0
+}
+
+// ContainsAny return whether str contains any one of subStrings.
+func ContainsAny(str string, subStrings []string) bool {
+	for _, sub := range subStrings {
+		if strings.Index(str, sub) >= 0 {
+			return true
+		}
+	}
+	return false
 }

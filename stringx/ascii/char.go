@@ -38,7 +38,7 @@ func IsAlphaBet(v byte) bool {
 	return 'A' <= v && v <= 'Z' || 'a' <= v && v <= 'z'
 }
 
-// IsDigit return if is a digit char([0, 9], [A, F], [a, f])
+// IsHex return if is a hex digit char([0, 9], [A, F], [a, f])
 func IsHex(v byte) bool {
 	return '0' <= v && v <= '9' || 'a' <= v && v <= 'f' || 'A' <= v && v <= 'F'
 }

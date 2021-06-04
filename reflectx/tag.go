@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-// Get tag value with name. if not present, return defaultValue
+// GetTagValue get tag value with name. if not present, return defaultValue
 func GetTagValue(tag reflect.StructTag, name string, defaultValue string) string {
 	if value, ok := tag.Lookup(name); ok {
 		return value
@@ -15,7 +15,7 @@ func GetTagValue(tag reflect.StructTag, name string, defaultValue string) string
 	return defaultValue
 }
 
-// Get tag value as int with name. if not present, return defaultValue.
+// GetIntTagValue get tag value as int with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetIntTagValue(tag reflect.StructTag, name string, defaultValue int) (int, error) {
 	if value, ok := tag.Lookup(name); ok {
@@ -24,7 +24,7 @@ func GetIntTagValue(tag reflect.StructTag, name string, defaultValue int) (int, 
 	return defaultValue, nil
 }
 
-// Get tag value as int64 with name. if not present, return defaultValue.
+// GetInt64TagValue get tag value as int64 with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetInt64TagValue(tag reflect.StructTag, name string, defaultValue int64) (int64, error) {
 	if value, ok := tag.Lookup(name); ok {
@@ -33,7 +33,7 @@ func GetInt64TagValue(tag reflect.StructTag, name string, defaultValue int64) (i
 	return defaultValue, nil
 }
 
-// Get tag value as uint with name. if not present, return defaultValue.
+// GetUIntTagValue get tag value as uint with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetUIntTagValue(tag reflect.StructTag, name string, defaultValue uint) (uint, error) {
 	if value, ok := tag.Lookup(name); ok {
@@ -42,7 +42,7 @@ func GetUIntTagValue(tag reflect.StructTag, name string, defaultValue uint) (uin
 	return defaultValue, nil
 }
 
-// Get tag value as uint64 with name. if not present, return defaultValue.
+// GetUInt64TagValue get tag value as uint64 with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetUInt64TagValue(tag reflect.StructTag, name string, defaultValue uint64) (uint64, error) {
 	if value, ok := tag.Lookup(name); ok {
@@ -51,7 +51,7 @@ func GetUInt64TagValue(tag reflect.StructTag, name string, defaultValue uint64) 
 	return defaultValue, nil
 }
 
-// Get tag value as boolean with name. if not present, return defaultValue.
+// GetBoolTagValue get tag value as boolean with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetBoolTagValue(tag reflect.StructTag, name string, defaultValue bool) (bool, error) {
 	if value, ok := tag.Lookup(name); ok {
@@ -60,7 +60,7 @@ func GetBoolTagValue(tag reflect.StructTag, name string, defaultValue bool) (boo
 	return defaultValue, nil
 }
 
-// Get tag value as float64 with name. if not present, return defaultValue.
+// GetFloat64TagValue get tag value as float64 with name. if not present, return defaultValue.
 // If tag present and parse error, return error.
 func GetFloat64TagValue(tag reflect.StructTag, name string, defaultValue float64) (float64, error) {
 	if value, ok := tag.Lookup(name); ok {
