@@ -108,7 +108,7 @@ type StringBody struct {
 	content string
 }
 
-// NewStringBody create new Body from strubg
+// NewStringBody create new Body from string content
 func NewStringBody(content string, contentType string) *StringBody {
 	return NewStringBodyWithEncoding(content, contentType, unicode.UTF8)
 }

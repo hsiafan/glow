@@ -55,6 +55,16 @@ func SafeParse32(str string, defaultValue float32) float32 {
 	return defaultValue
 }
 
+// Max64 returns the larger one of float64 values
+func Max64(value1, value2 float64) float64 {
+	return math.Max(value1, value2)
+}
+
+// Min64 returns the smaller one of float64 values
+func Min64(value1, value2 float64) float64 {
+	return math.Min(value1, value2)
+}
+
 // Max32 return the larger one of float values
 func Max32(value1, value2 float32) float32 {
 	return float32(math.Max(float64(value1), float64(value2)))
