@@ -1,6 +1,7 @@
 package syncx
 
 import (
+	"github.com/hsiafan/glow/internal"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -16,8 +17,9 @@ const (
 // TryLock try to lock a mutex, if cannot acquire, return false immediately.
 // If acquired, return true.
 func TryLock(m *sync.Mutex) bool {
+	mm := (*internal.Mutex)(unsafe.Pointer(m))
 	// state is first field
-	if atomic.CompareAndSwapInt32((*int32)(unsafe.Pointer(m)), 0, mutexLocked) {
+	if atomic.CompareAndSwapInt32(&mm.State, 0, mutexLocked) {
 		return true
 	}
 	return false
@@ -25,5 +27,6 @@ func TryLock(m *sync.Mutex) bool {
 
 // IsLocked return weather lock is locked
 func IsLocked(m *sync.Mutex) bool {
-	return atomic.LoadInt32((*int32)(unsafe.Pointer(m))) == mutexLocked
+	mm := (*internal.Mutex)(unsafe.Pointer(m))
+	return atomic.LoadInt32(&mm.State) == mutexLocked
 }

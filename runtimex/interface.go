@@ -1,16 +1,13 @@
 package runtimex
 
-import "unsafe"
-
-// A struct having same structure with interface
-type eface struct {
-	_type unsafe.Pointer
-	value unsafe.Pointer
-}
+import (
+	"github.com/hsiafan/glow/internal"
+	"unsafe"
+)
 
 // InterfaceValuePtr return the value pointer of interface
 func InterfaceValuePtr(iface interface{}) unsafe.Pointer {
-	return (*eface)(unsafe.Pointer(&iface)).value
+	return (*internal.Interface)(unsafe.Pointer(&iface)).Value
 }
 
 // InterfaceIsNil return true if interface is nil or it's value is a nil pointer
