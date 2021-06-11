@@ -26,7 +26,7 @@ const (
 	requiredField     = "required"    // If this args is required(true|false). Default is false. If default value is set, the required filed will be ignored.
 )
 
-// alias command handle function
+// Handle is alias command handle function
 type Handle = func() error
 
 // Command is a command line
