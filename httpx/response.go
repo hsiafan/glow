@@ -14,8 +14,8 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
-// ResponseContext carry http response and errors.
-type ResponseContext struct {
+// ResponseHolder carry http response and errors.
+type ResponseHolder struct {
 	Response *http.Response
 	Err      error
 }
@@ -55,12 +55,12 @@ type ResponseHeader struct {
 }
 
 // DiscardBody read and discard all response body
-func (r *ResponseContext) DiscardBody() (*ResponseHeader, int64, error) {
+func (r *ResponseHolder) DiscardBody() (*ResponseHeader, int64, error) {
 	return r.WriteToWriter(ioutil.Discard)
 }
 
 // ReadAll read all response body, to bytes
-func (r *ResponseContext) ReadAll() (*ResponseHeader, []byte, error) {
+func (r *ResponseHolder) ReadAll() (*ResponseHeader, []byte, error) {
 	if r.Err != nil {
 		return nil, nil, r.Err
 	}
@@ -70,7 +70,7 @@ func (r *ResponseContext) ReadAll() (*ResponseHeader, []byte, error) {
 }
 
 // ReadAllString read all response body, to string
-func (r *ResponseContext) ReadAllString() (*ResponseHeader, string, error) {
+func (r *ResponseHolder) ReadAllString() (*ResponseHeader, string, error) {
 	if r.Err != nil {
 		return nil, "", r.Err
 	}
@@ -87,7 +87,7 @@ func (r *ResponseContext) ReadAllString() (*ResponseHeader, string, error) {
 }
 
 // GetEncoding get encoding from response header. If header not set charset for content-type, return nil.
-func (r *ResponseContext) GetEncoding() encoding.Encoding {
+func (r *ResponseHolder) GetEncoding() encoding.Encoding {
 	contentType := r.Response.Header.Get(HeaderContenttype)
 	if contentType == "" {
 		return nil
@@ -107,7 +107,7 @@ func (r *ResponseContext) GetEncoding() encoding.Encoding {
 }
 
 // Read all response body data, and write to target writer.
-func (r *ResponseContext) WriteToWriter(w io.Writer) (*ResponseHeader, int64, error) {
+func (r *ResponseHolder) WriteToWriter(w io.Writer) (*ResponseHeader, int64, error) {
 	if r.Err != nil {
 		return nil, 0, r.Err
 	}
@@ -117,7 +117,7 @@ func (r *ResponseContext) WriteToWriter(w io.Writer) (*ResponseHeader, int64, er
 }
 
 // Read all response body, write to target writer.
-func (r *ResponseContext) WriteToFile(path string) (*ResponseHeader, int64, error) {
+func (r *ResponseHolder) WriteToFile(path string) (*ResponseHeader, int64, error) {
 	if r.Err != nil {
 		return nil, 0, r.Err
 	}
@@ -132,7 +132,7 @@ func (r *ResponseContext) WriteToFile(path string) (*ResponseHeader, int64, erro
 }
 
 // DecodeJSON decode http body as json, into a value.
-func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseHeader, error) {
+func (r *ResponseHolder) DecodeJSON(v interface{}) (*ResponseHeader, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}
@@ -148,7 +148,7 @@ func (r *ResponseContext) DecodeJSON(v interface{}) (*ResponseHeader, error) {
 	return r.toResponseHeader(), err
 }
 
-func (r *ResponseContext) toResponseHeader() *ResponseHeader {
+func (r *ResponseHolder) toResponseHeader() *ResponseHeader {
 	if r.Response == nil {
 		return nil
 	}

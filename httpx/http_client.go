@@ -53,49 +53,49 @@ func NewClient(options ...ClientOption) *Client {
 }
 
 // Head send a head request
-func (c *Client) Head(url string, options ...RequestOption) *ResponseContext {
+func (c *Client) Head(url string, options ...RequestOption) *ResponseHolder {
 	req, err := http.NewRequest("HEAD", url, nil)
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	return c.Send(req, options...)
 }
 
 // Get send a get request
-func (c *Client) Get(url string, options ...RequestOption) *ResponseContext {
+func (c *Client) Get(url string, options ...RequestOption) *ResponseHolder {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	return c.Send(req, options...)
 }
 
 // Delete send a delete request
-func (c *Client) Delete(url string, options ...RequestOption) *ResponseContext {
+func (c *Client) Delete(url string, options ...RequestOption) *ResponseHolder {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	return c.Send(req, options...)
 }
 
 // Put put send a put request with body
-func (c *Client) Put(url string, body Body, options ...RequestOption) *ResponseContext {
+func (c *Client) Put(url string, body Body, options ...RequestOption) *ResponseHolder {
 	if body == nil {
 		body = EmptyBody()
 	}
 	reader, err := body.GetReader()
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	req, err := http.NewRequest("PUT", url, reader)
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 
 	contentType, err := c.makeContentType(body.MimeType(), body.Encoding())
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	if contentType != "" {
 		req.Header.Set(HeaderContenttype, contentType)
@@ -104,21 +104,21 @@ func (c *Client) Put(url string, body Body, options ...RequestOption) *ResponseC
 }
 
 // Post send a post request with body
-func (c *Client) Post(url string, body Body, options ...RequestOption) *ResponseContext {
+func (c *Client) Post(url string, body Body, options ...RequestOption) *ResponseHolder {
 	if body == nil {
 		body = EmptyBody()
 	}
 	reader, err := body.GetReader()
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	req, err := http.NewRequest("POST", url, reader)
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	contentType, err := c.makeContentType(body.MimeType(), body.Encoding())
 	if err != nil {
-		return &ResponseContext{Err: err}
+		return &ResponseHolder{Err: err}
 	}
 	if contentType != "" {
 		req.Header.Set(HeaderContenttype, contentType)
@@ -141,17 +141,19 @@ func (c *Client) makeContentType(contentType string, encoding encoding.Encoding)
 }
 
 // Send send a http request with options.
-func (c *Client) Send(r *http.Request, options ...RequestOption) *ResponseContext {
+func (c *Client) Send(r *http.Request, options ...RequestOption) *ResponseHolder {
 	if c.userAgent != "" {
 		r.Header.Set(HeaderUseragent, c.userAgent)
 	}
 	for _, option := range options {
-		if err := option(r); err != nil {
-			return &ResponseContext{Err: err}
+		var err error
+		err, r = option(r)
+		if err != nil {
+			return &ResponseHolder{Err: err}
 		}
 	}
 	resp, err := c.client.Do(r)
-	return &ResponseContext{resp, err}
+	return &ResponseHolder{resp, err}
 }
 
 // ClientOption for setting http client option.
