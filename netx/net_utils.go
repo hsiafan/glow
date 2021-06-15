@@ -1,9 +1,11 @@
 package netx
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
+	"time"
 )
 
 // JoinHostPort combines host and port into a network address of the
@@ -62,4 +64,38 @@ func GetHostType(host string) HostType {
 		return IPv6
 	}
 	return ILLEGAL
+}
+
+// DialTCP dial to a address using tcp
+func DialTCP(address string) (*net.TCPConn, error) {
+	var d net.Dialer
+	return DialTCPWithDialer(d, address)
+}
+
+// DialTCPWithDialer dial to a address using tcp
+func DialTCPWithDialer(dialer net.Dialer, address string) (*net.TCPConn, error) {
+	conn, err := dialer.Dial("tcp", address)
+	if err != nil {
+		return nil, err
+	}
+	return conn.(*net.TCPConn), err
+}
+
+// DialTCPContext dial to a address using tcp with a context
+func DialTCPContext(ctx context.Context, address string) (*net.TCPConn, error) {
+	var dialer net.Dialer
+	conn, err := dialer.DialContext(ctx, "tcp", address)
+	if err != nil {
+		return nil, err
+	}
+	return conn.(*net.TCPConn), err
+}
+
+// DialTCPTimeout dial to a address using tcp with a timeout
+func DialTCPTimeout(address string, timeout time.Duration) (*net.TCPConn, error) {
+	conn, err := net.DialTimeout("tcp", address, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return conn.(*net.TCPConn), err
 }

@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-// RunCommandWithTimeout run the command, with a timeout value.
+// RunCommandTimeout run the command, with a timeout value.
 // If command does not finish before timeout, the process would be destroyed, a timeout error will be return.
-func RunCommandWithTimeout(cmd *exec.Cmd, timeout time.Duration) error {
+func RunCommandTimeout(cmd *exec.Cmd, timeout time.Duration) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
@@ -30,9 +30,9 @@ func RunCommandWithTimeout(cmd *exec.Cmd, timeout time.Duration) error {
 	}
 }
 
-// RunCommandWithContext run the command, with a context, which may cancel before command finished..
+// RunCommandContext run the command, with a context, which may cancel before command finished..
 // If so the process would be destroyed, a error will be return.
-func RunCommandWithContext(cmd *exec.Cmd, ctx context.Context) error {
+func RunCommandContext(cmd *exec.Cmd, ctx context.Context) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}

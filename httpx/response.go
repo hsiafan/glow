@@ -3,7 +3,6 @@ package httpx
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -56,7 +55,7 @@ type ResponseHeader struct {
 
 // DiscardBody read and discard all response body
 func (r *ResponseHolder) DiscardBody() (*ResponseHeader, int64, error) {
-	return r.WriteToWriter(ioutil.Discard)
+	return r.WriteToWriter(io.Discard)
 }
 
 // ReadAll read all response body, to bytes
@@ -65,7 +64,7 @@ func (r *ResponseHolder) ReadAll() (*ResponseHeader, []byte, error) {
 		return nil, nil, r.Err
 	}
 	defer iox.Close(r.Response.Body)
-	data, err := ioutil.ReadAll(r.Response.Body)
+	data, err := io.ReadAll(r.Response.Body)
 	return r.toResponseHeader(), data, err
 }
 

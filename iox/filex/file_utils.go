@@ -3,7 +3,6 @@ package filex
 import (
 	"github.com/hsiafan/glow/stringx"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/hsiafan/glow/iox"
@@ -12,7 +11,7 @@ import (
 
 // ReadAllToStringWithEncoding read and return all data as string in file
 func ReadAllToStringWithEncoding(path string, enc encoding.Encoding) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -25,7 +24,7 @@ func ReadAllToStringWithEncoding(path string, enc encoding.Encoding) (string, er
 
 // ReadAllToString read and return all data as string in file
 func ReadAllToString(path string) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -34,7 +33,7 @@ func ReadAllToString(path string) (string, error) {
 
 // ReadAllBytes read and return all data in file
 func ReadAllBytes(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
+	return os.ReadFile(path)
 }
 
 // ReadAllToWriter read all data from file, into a writer

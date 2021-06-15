@@ -4,7 +4,6 @@ import (
 	"github.com/hsiafan/glow/stringx"
 	"golang.org/x/text/encoding"
 	"io"
-	"io/ioutil"
 )
 
 // ReadAllStringWithEncoding read and return all data as string in reader, with encoding the data used
@@ -15,7 +14,7 @@ func ReadAllStringWithEncoding(r io.Reader, encoding encoding.Encoding) (string,
 
 // ReadAllString read and return all data as string in reader
 func ReadAllString(r io.Reader) (string, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return "", err
 	}
@@ -24,7 +23,7 @@ func ReadAllString(r io.Reader) (string, error) {
 
 // ReadAll read and return all data in reader
 func ReadAll(r io.Reader) ([]byte, error) {
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }
 
 // ForEachLineWithEncoding read all lines in reader with specific encoding, and call consume function,
