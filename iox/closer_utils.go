@@ -12,8 +12,8 @@ func Close(closer io.Closer) {
 	}
 }
 
-// CloseIfIsCloser close a resource, if the resource is an io.Closer. If close return an error, the error is ignored.
-func CloseIfIsCloser(resource interface{}) {
+// TryClose close a resource, if the resource is an io.Closer. If close return an error, the error is ignored.
+func TryClose(resource interface{}) {
 	if resource == nil {
 		return
 	}
@@ -24,8 +24,30 @@ func CloseIfIsCloser(resource interface{}) {
 	}
 }
 
-// WithCloser run function, and then close the closer
-func WithCloser(closer io.Closer, f func(io.Closer)) {
-	defer Close(closer)
-	f(closer)
+// CloseMulti close multi closers and ignore errors
+func CloseMulti(closers ...io.Closer) {
+	for _, closer := range closers {
+		_ = closer.Close()
+	}
+}
+
+// TryCloseMulti try close multi resources, if it is a closer
+func TryCloseMulti(resources ...interface{}) {
+	for _, r := range resources {
+		TryClose(r)
+	}
+}
+
+// TryCloseMultiReader try close multi readers, if it is a closer
+func TryCloseMultiReader(readers ...io.Reader) {
+	for _, r := range readers {
+		TryClose(r)
+	}
+}
+
+// TryCloseMultiWriter try close multi resources, if it is a closer
+func TryCloseMultiWriter(writers ...io.Writer) {
+	for _, w := range writers {
+		TryClose(w)
+	}
 }

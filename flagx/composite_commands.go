@@ -5,14 +5,14 @@ import (
 	"os"
 )
 
-// CompositeCommand
+// CompositeCommand for commands
 type CompositeCommand struct {
 	Name        string     // the command name
 	Description string     // the description
 	subCommands []*Command // sub commands
 }
 
-// Create new CompositeCommand
+// NewCompositeCommand create new CompositeCommand
 func NewCompositeCommand(Name string, description string) *CompositeCommand {
 	return &CompositeCommand{
 		Name:        Name,
@@ -32,12 +32,12 @@ func (c *CompositeCommand) AddSubCommand(name string, description string, option
 	return nil
 }
 
-// Parse commandline passed arguments, and execute command
+// ParseOsArgsAndExecute parse commandline passed arguments, and execute command
 func (c *CompositeCommand) ParseOsArgsAndExecute() {
 	c.ParseAndExecute(os.Args[1:])
 }
 
-// Parse arguments, and execute command
+// ParseAndExecute parse arguments, and execute command
 func (c *CompositeCommand) ParseAndExecute(arguments []string) {
 	if len(arguments) == 0 {
 		arguments = []string{"help"}
@@ -56,7 +56,7 @@ func (c *CompositeCommand) ParseAndExecute(arguments []string) {
 	os.Exit(-1)
 }
 
-// Show usage
+// ShowUsage show usage
 func (c *CompositeCommand) ShowUsage() {
 	if c.Description != "" {
 		fmt.Println(c.Description + "\n")

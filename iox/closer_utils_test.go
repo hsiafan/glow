@@ -6,13 +6,13 @@ import (
 )
 
 func TestCloseIfIsCloser(t *testing.T) {
-	CloseIfIsCloser(nil)
+	TryClose(nil)
 	var closer io.Closer = nil
-	CloseIfIsCloser(closer)
+	TryClose(closer)
 	var closer1 *testClose = nil
-	CloseIfIsCloser(closer1)
+	TryClose(closer1)
 	var closer2 testClose
-	CloseIfIsCloser(&closer2)
+	TryClose(&closer2)
 }
 
 type testClose int
