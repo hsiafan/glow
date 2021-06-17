@@ -287,11 +287,11 @@ func argsDesc(raf *remainedArgsField, argFields map[int]*positionalArgField) str
 	return buffer.String()
 }
 
-func toFlagName(filedName string) string {
+func toFlagName(fieldName string) string {
 	var sb strings.Builder
 
-	for i := 0; i < len(filedName); i++ {
-		c := filedName[i]
+	for i := 0; i < len(fieldName); i++ {
+		c := fieldName[i]
 		if ascii.IsUpper(c) {
 			if sb.Len() != 0 {
 				sb.WriteByte('-')

@@ -208,10 +208,10 @@ var _ Body = (*MultiPartBody)(nil)
 
 // MultiPartBody is http multi-part form body
 type MultiPartBody struct {
-	parts   []*Part
-	reader  *io.PipeReader
-	writer  *io.PipeWriter
-	mwriter *multipart.Writer
+	parts           []*Part
+	reader          *io.PipeReader
+	writer          *io.PipeWriter
+	multiPartWriter *multipart.Writer
 }
 
 // NewMultiPartBody create new multi part body
@@ -219,9 +219,10 @@ func NewMultiPartBody(parts []*Part) *MultiPartBody {
 	pr, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
 	return &MultiPartBody{
-		parts:   parts,
-		reader:  pr,
-		mwriter: writer,
+		parts:           parts,
+		reader:          pr,
+		writer:          pw,
+		multiPartWriter: writer,
 	}
 }
 
@@ -230,42 +231,43 @@ func (m *MultiPartBody) Encoding() encoding.Encoding {
 }
 
 func (m *MultiPartBody) MimeType() string {
-	return m.mwriter.FormDataContentType()
+	return m.multiPartWriter.FormDataContentType()
 }
 
 func (m *MultiPartBody) GetReader() (io.Reader, error) {
 	go func() {
-		defer func() {
-			for _, part := range m.parts {
-				if part._type == filePart {
-					if closer, ok := part.reader.(io.Closer); ok {
-						_ = closer.Close()
-					}
-				}
-			}
-		}()
 		for _, part := range m.parts {
 			switch part._type {
 			case formPart:
-				err := m.mwriter.WriteField(part.name, part.value)
+				err := m.multiPartWriter.WriteField(part.name, part.value)
 				if err != nil {
 					_ = m.writer.CloseWithError(err)
 					return
 				}
 			case filePart:
-				partWriter, err := m.mwriter.CreateFormFile(part.name, part.filename)
+				partWriter, err := m.multiPartWriter.CreateFormFile(part.name, part.filename)
 				if err != nil {
 					_ = m.writer.CloseWithError(err)
 					return
 				}
 
-				_, err = io.Copy(partWriter, part.reader)
+				r, err := part.reader()
+				if err != nil {
+					_ = m.writer.CloseWithError(err)
+					return
+				}
+
+				func() {
+					defer iox.TryClose(r)
+					_, err = io.Copy(partWriter, r)
+				}()
+
 				if err != nil {
 					_ = m.writer.CloseWithError(err)
 					return
 				}
 			default:
-				panic("unknown part type: " + strconv.Itoa(part._type))
+				panic("unknown part type: " + strconv.Itoa(int(part._type)))
 			}
 		}
 	}()

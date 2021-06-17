@@ -3,50 +3,68 @@ package httpx
 import (
 	"bytes"
 	"io"
+	"os"
 )
+
+type formType int
 
 const (
-	formPart = 0
-	filePart = 2
+	formPart formType = 0
+	filePart formType = 2
 )
 
-// Part is one part of multi-part encoded body, can be key-value param form part, or file part.
+// Part is one part of multi-part encoded body, can be key-value form field, or form file part.
 type Part struct {
-	_type int
+	_type formType
 	// form part
-	name  string
-	value string
+	name  string // the name of this part
+	value string // the value, used for form filed
 
 	// file part
-	filename string
-	reader   io.Reader
+	filename string                    // the file name, used for form file
+	reader   func() (io.Reader, error) // provide the reader to get file content, used for form file
 }
 
 // NewFormPart create one new key-value param Part.
-func NewFormPart(filedName string, value string) *Part {
+func NewFormPart(name string, value string) *Part {
 	return &Part{
 		_type: formPart,
-		name:  filedName,
+		name:  name,
 		value: value,
 	}
 }
 
 // NewFilePart create one new file Part.
-func NewFilePart(filedName string, filename string, reader io.Reader) *Part {
+// param readerProvider provide the reader contains the content of this part, should allow call multi times.
+func NewFilePart(name string, filename string, readerProvider func() (io.Reader, error)) *Part {
 	return &Part{
 		_type:    filePart,
-		name:     filedName,
+		name:     name,
 		filename: filename,
-		reader:   reader,
+		reader:   readerProvider,
 	}
 }
 
 // NewBytesFilePart create one new file Part from binary array.
-func NewBytesFilePart(filedName string, filename string, data []byte) *Part {
+func NewBytesFilePart(name string, filename string, data []byte) *Part {
 	return &Part{
 		_type:    filePart,
-		name:     filedName,
+		name:     name,
 		filename: filename,
-		reader:   bytes.NewReader(data),
+		reader: func() (io.Reader, error) {
+			return bytes.NewReader(data), nil
+		},
+	}
+}
+
+// NewFSFilePart create one new file Part from a file in file system.
+func NewFSFilePart(name string, filename string, path string) *Part {
+	return &Part{
+		_type:    filePart,
+		name:     name,
+		filename: filename,
+		reader: func() (io.Reader, error) {
+			return os.Open(path)
+		},
 	}
 }
