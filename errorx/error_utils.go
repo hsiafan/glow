@@ -68,7 +68,7 @@ func UnwrapUtil(err error, f func(e error) bool) error {
 	}
 }
 
-// UnwrapToRoot recursively unwrap the err's chain, util the err is not a WrapError, and return this err.
+// UnwrapToRoot recursively unwrap the err chain, util the err is not a WrapError, and return this err.
 func UnwrapToRoot(err error) error {
 	for {
 		ne := errors.Unwrap(err)

@@ -5,12 +5,12 @@ import (
 	"strconv"
 )
 
-// Format64 convert float64 to string, with decimals nums.
+// Format64 convert float64 to string, with decimals numbers.
 func Format64(value float64, decimals int) string {
 	return strconv.FormatFloat(value, 'f', decimals, 64)
 }
 
-// Format32 convert float32 to string, with decimals nums.
+// Format32 convert float32 to string, with decimals numbers.
 func Format32(value float32, decimals int) string {
 	return strconv.FormatFloat(float64(value), 'f', decimals, 32)
 }

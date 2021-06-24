@@ -54,7 +54,7 @@ type ResponseHeader struct {
 }
 
 // DiscardBody read and discard all response body
-func (r *ResponseHolder) DiscardBody() (*ResponseHeader, int64, error) {
+func (r *ResponseHolder) DiscardBody() (*ResponseHeader, error) {
 	return r.WriteToWriter(io.Discard)
 }
 
@@ -105,29 +105,29 @@ func (r *ResponseHolder) GetEncoding() encoding.Encoding {
 	return nil
 }
 
-// Read all response body data, and write to target writer.
-func (r *ResponseHolder) WriteToWriter(w io.Writer) (*ResponseHeader, int64, error) {
+// WriteToWriter read all response body data, and write to target writer.
+func (r *ResponseHolder) WriteToWriter(w io.Writer) (*ResponseHeader, error) {
 	if r.Err != nil {
-		return nil, 0, r.Err
+		return nil, r.Err
 	}
 	defer iox.Close(r.Response.Body)
-	written, err := io.Copy(w, r.Response.Body)
-	return r.toResponseHeader(), written, err
+	_, err := io.Copy(w, r.Response.Body)
+	return r.toResponseHeader(), err
 }
 
-// Read all response body, write to target writer.
-func (r *ResponseHolder) WriteToFile(path string) (*ResponseHeader, int64, error) {
+// WriteToFile read all response body, write to file.
+func (r *ResponseHolder) WriteToFile(path string) (*ResponseHeader, error) {
 	if r.Err != nil {
-		return nil, 0, r.Err
+		return nil, r.Err
 	}
 	defer iox.Close(r.Response.Body)
 	f, err := os.Create(path)
 	if err != nil {
-		return r.toResponseHeader(), 0, err
+		return r.toResponseHeader(), err
 	}
 	defer iox.Close(f)
-	written, err := io.Copy(f, r.Response.Body)
-	return r.toResponseHeader(), written, err
+	_, err = io.Copy(f, r.Response.Body)
+	return r.toResponseHeader(), err
 }
 
 // DecodeJSON decode http body as json, into a value.

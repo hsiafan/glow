@@ -32,7 +32,7 @@ func RunCommandTimeout(cmd *exec.Cmd, timeout time.Duration) error {
 
 // RunCommandContext run the command, with a context, which may cancel before command finished..
 // If so the process would be destroyed, a error will be return.
-func RunCommandContext(cmd *exec.Cmd, ctx context.Context) error {
+func RunCommandContext(ctx context.Context, cmd *exec.Cmd) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
