@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/hsiafan/glow/floatx"
-	"github.com/hsiafan/glow/intx"
+	floatx2 "github.com/hsiafan/glow/mathx/floatx"
+	intx2 "github.com/hsiafan/glow/mathx/intx"
 	"github.com/hsiafan/glow/reflectx"
 	"github.com/hsiafan/glow/stringx"
 	"github.com/hsiafan/glow/stringx/ascii"
@@ -381,25 +381,25 @@ func setValue(str string, kind reflect.Kind, value reflect.Value) error {
 	case reflect.String:
 		value.SetString(str)
 	case reflect.Int:
-		v, err := intx.Parse(str)
+		v, err := intx2.Parse(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int8:
-		v, err := intx.Parse8(str)
+		v, err := intx2.Parse8(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int16:
-		v, err := intx.Parse16(str)
+		v, err := intx2.Parse16(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(int64(v))
 	case reflect.Int32:
-		v, err := intx.Parse32(str)
+		v, err := intx2.Parse32(str)
 		if err != nil {
 			return err
 		}
@@ -414,49 +414,49 @@ func setValue(str string, kind reflect.Kind, value reflect.Value) error {
 			value.Set(reflect.ValueOf(v))
 			return nil
 		}
-		v, err := intx.Parse64(str)
+		v, err := intx2.Parse64(str)
 		if err != nil {
 			return err
 		}
 		value.SetInt(v)
 	case reflect.Uint:
-		v, err := intx.ParseUnsigned(str)
+		v, err := intx2.ParseUnsigned(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint8:
-		v, err := intx.ParseUnsigned8(str)
+		v, err := intx2.ParseUnsigned8(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint16:
-		v, err := intx.ParseUnsigned16(str)
+		v, err := intx2.ParseUnsigned16(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint32:
-		v, err := intx.ParseUnsigned32(str)
+		v, err := intx2.ParseUnsigned32(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(uint64(v))
 	case reflect.Uint64:
-		v, err := intx.ParseUnsigned64(str)
+		v, err := intx2.ParseUnsigned64(str)
 		if err != nil {
 			return err
 		}
 		value.SetUint(v)
 	case reflect.Float32:
-		v, err := floatx.Parse32(str)
+		v, err := floatx2.Parse32(str)
 		if err != nil {
 			return err
 		}
 		value.SetFloat(float64(v))
 	case reflect.Float64:
-		v, err := floatx.Parse64(str)
+		v, err := floatx2.Parse64(str)
 		if err != nil {
 			return err
 		}

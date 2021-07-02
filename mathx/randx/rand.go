@@ -2,7 +2,7 @@ package randx
 
 import (
 	"errors"
-	"github.com/hsiafan/glow/intx"
+	intx2 "github.com/hsiafan/glow/mathx/intx"
 	"github.com/hsiafan/glow/timex"
 	"math"
 	"math/rand"
@@ -49,7 +49,7 @@ func (r *Rand) IntBetween(low int, high int) int {
 	if low >= high {
 		panic(boundRangeError)
 	}
-	if low < 0 && (intx.MaxInt+low) < high {
+	if low < 0 && (intx2.MaxInt+low) < high {
 		panic(boundOverFlowError)
 	}
 	v := r.IntWithin(high - low)

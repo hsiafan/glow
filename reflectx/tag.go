@@ -1,8 +1,8 @@
 package reflectx
 
 import (
-	"github.com/hsiafan/glow/floatx"
-	"github.com/hsiafan/glow/intx"
+	floatx2 "github.com/hsiafan/glow/mathx/floatx"
+	intx2 "github.com/hsiafan/glow/mathx/intx"
 	"reflect"
 	"strconv"
 )
@@ -37,7 +37,7 @@ func GetInt64TagValue(tag reflect.StructTag, name string, defaultValue int64) (i
 // If tag present and parse error, return error.
 func GetUIntTagValue(tag reflect.StructTag, name string, defaultValue uint) (uint, error) {
 	if value, ok := tag.Lookup(name); ok {
-		return intx.ParseUnsigned(value)
+		return intx2.ParseUnsigned(value)
 	}
 	return defaultValue, nil
 }
@@ -64,7 +64,7 @@ func GetBoolTagValue(tag reflect.StructTag, name string, defaultValue bool) (boo
 // If tag present and parse error, return error.
 func GetFloat64TagValue(tag reflect.StructTag, name string, defaultValue float64) (float64, error) {
 	if value, ok := tag.Lookup(name); ok {
-		return floatx.Parse64(value)
+		return floatx2.Parse64(value)
 	}
 	return defaultValue, nil
 }

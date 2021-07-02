@@ -2,7 +2,7 @@ package stringx
 
 import (
 	"fmt"
-	"github.com/hsiafan/glow/intx"
+	intx2 "github.com/hsiafan/glow/mathx/intx"
 	"strings"
 )
 
@@ -87,28 +87,28 @@ func (j *JoinBuffer) Add(str string) *JoinBuffer {
 // AddInt add a new int item to JoinBuffer
 func (j *JoinBuffer) AddInt(value int) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.Format(value))
+	j.builder.WriteString(intx2.Format(value))
 	return j
 }
 
 // AddUint add a new uint item to JoinBuffer
 func (j *JoinBuffer) AddUint(value uint) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatUnsigned(value))
+	j.builder.WriteString(intx2.FormatUnsigned(value))
 	return j
 }
 
 // AddInt64 add a new int64 item to JoinBuffer
 func (j *JoinBuffer) AddInt64(value int64) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.Format64(value))
+	j.builder.WriteString(intx2.Format64(value))
 	return j
 }
 
 // AddUint64 add a new uint64 item to JoinBuffer
 func (j *JoinBuffer) AddUint64(value uint64) *JoinBuffer {
 	j.prepend()
-	j.builder.WriteString(intx.FormatUnsigned64(value))
+	j.builder.WriteString(intx2.FormatUnsigned64(value))
 	return j
 }
 

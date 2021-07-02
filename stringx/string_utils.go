@@ -2,8 +2,8 @@ package stringx
 
 import (
 	"fmt"
-	"github.com/hsiafan/glow/floatx"
-	"github.com/hsiafan/glow/intx"
+	floatx2 "github.com/hsiafan/glow/mathx/floatx"
+	intx2 "github.com/hsiafan/glow/mathx/intx"
 	"github.com/hsiafan/glow/stringx/ascii"
 	"strconv"
 	"strings"
@@ -25,29 +25,29 @@ func ValueOf(v interface{}) string {
 	case bool:
 		return strconv.FormatBool(v.(bool))
 	case int:
-		return intx.Format(v.(int))
+		return intx2.Format(v.(int))
 	case int8:
-		return intx.Format8(v.(int8))
+		return intx2.Format8(v.(int8))
 	case int16:
-		return intx.Format16(v.(int16))
+		return intx2.Format16(v.(int16))
 	case int32:
-		return intx.Format32(v.(int32))
+		return intx2.Format32(v.(int32))
 	case int64:
-		return intx.Format64(v.(int64))
+		return intx2.Format64(v.(int64))
 	case uint:
-		return intx.FormatUnsigned(v.(uint))
+		return intx2.FormatUnsigned(v.(uint))
 	case uint8:
-		return intx.FormatUnsigned8(v.(uint8))
+		return intx2.FormatUnsigned8(v.(uint8))
 	case uint16:
-		return intx.FormatUnsigned16(v.(uint16))
+		return intx2.FormatUnsigned16(v.(uint16))
 	case uint32:
-		return intx.FormatUnsigned32(v.(uint32))
+		return intx2.FormatUnsigned32(v.(uint32))
 	case uint64:
-		return intx.FormatUnsigned64(v.(uint64))
+		return intx2.FormatUnsigned64(v.(uint64))
 	case float32:
-		return floatx.SimpleFormat32(v.(float32))
+		return floatx2.SimpleFormat32(v.(float32))
 	case float64:
-		return floatx.SimpleFormat64(v.(float64))
+		return floatx2.SimpleFormat64(v.(float64))
 	case complex64:
 		c := v.(complex64)
 		return strconv.FormatComplex(complex(float64(real(c)), float64(imag(c))), 'f', -1, 64)
