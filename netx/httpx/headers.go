@@ -72,7 +72,7 @@ const (
 	HeaderStrictTransportSecurity       string = "Strict-Transport-Security"
 	HeaderTransferEncoding              string = "Transfer-Encoding"
 	HeaderUpgrade                       string = "Upgrade"
-	HeaderUseragent                     string = "User-Agent"
+	HeaderUserAgent                     string = "User-Agent"
 	HeaderVariantVary                   string = "Variant-Vary"
 	HeaderVary                          string = "Vary"
 	HeaderVia                           string = "Via"

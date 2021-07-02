@@ -38,7 +38,7 @@ type RType struct {
 	// function for comparing objects of this type
 	// (ptr to object A, ptr to object B) -> ==?
 	Equal     func(unsafe.Pointer, unsafe.Pointer) bool
-	Gcdata    *byte // garbage collection data
+	GCData    *byte // garbage collection data
 	Str       int32 // string form
 	PtrToThis int32 // type for pointer to this type, may be zero
 }

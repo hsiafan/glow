@@ -143,7 +143,7 @@ func (c *Client) makeContentType(contentType string, encoding encoding.Encoding)
 // Send send a http request with options.
 func (c *Client) Send(r *http.Request, options ...RequestOption) *ResponseHolder {
 	if c.userAgent != "" {
-		r.Header.Set(HeaderUseragent, c.userAgent)
+		r.Header.Set(HeaderUserAgent, c.userAgent)
 	}
 	for _, option := range options {
 		var err error

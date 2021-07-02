@@ -5,48 +5,10 @@ import (
 	"reflect"
 )
 
-// IsInt return if is int value
-func IsInt(v interface{}) bool {
-	switch v.(type) {
-	case int:
-		return true
-	case int8:
-		return true
-	case int16:
-		return true
-	case int32:
-		return true
-	case int64:
-		return true
-	case uint:
-		return true
-	case uint8:
-		return true
-	case uint16:
-		return true
-	case uint32:
-		return true
-	case uint64:
-		return true
-	default:
-		return false
-	}
-}
-
-// IsFloat return if is float value
-func IsFloat(v interface{}) bool {
-	switch v.(type) {
-	case float32:
-		return true
-	case float64:
-		return true
-	default:
-		return false
-	}
-}
-
 // StructToMap convert struct to map, using field name as key, field value as map value.
-// Only exported fields are set into map.
+// The Field name can be override using 'name' struct tag.
+//
+// Note: only exported fields are set into map.
 func StructToMap(value interface{}) map[string]interface{} {
 	v := reflect.ValueOf(value)
 	switch v.Kind() {
@@ -70,7 +32,12 @@ func toMap(v reflect.Value) map[string]interface{} {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)
 		if f.CanInterface() {
-			m[v.Type().Field(i).Name] = f.Interface()
+			sf := v.Type().Field(i)
+			name := sf.Tag.Get("name")
+			if name == "" {
+				name = sf.Name
+			}
+			m[name] = f.Interface()
 		}
 	}
 	return m
