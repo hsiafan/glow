@@ -1,6 +1,9 @@
 package internal
 
-import "unsafe"
+import (
+	"sync"
+	"unsafe"
+)
 
 // SliceHeader copy from reflect.SliceHeader, using Data type unsafe.Pointer instead of unitptr, to prevent stack allocation, or free by gc
 type SliceHeader struct {
@@ -47,6 +50,15 @@ type RType struct {
 type Mutex struct {
 	State int32
 	Sema  uint32
+}
+
+// RWMutex for sync.RWMutex
+type RWMutex struct {
+	WLock       sync.Mutex // held if there are pending writers
+	WriterSem   uint32     // semaphore for writers to wait for completing readers
+	ReaderSem   uint32     // semaphore for readers to wait for completing writers
+	ReaderCount int32      // number of pending readers
+	ReaderWait  int32      // number of departing readers
 }
 
 // Chan for go channel
